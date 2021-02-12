@@ -1,0 +1,509 @@
+---
+title: "COVID19 Study1 Data Cleaning"
+author: "Dani Cosme"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    highlight: tango
+    theme: united
+    toc: yes
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+  github_document:
+    toc: true
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+options(scipen=999)
+```
+
+# load packages
+```{r}
+if (!require(tidyverse)) {
+  install.packages('tidyverse')
+}
+if (!require(knitr)) {
+  install.packages('knitr')
+}
+if (!require(DT)) {
+  install.packages('DT')
+}
+```
+
+# load and tidy data
+
+* The survey key is located [here](https://upenn.box.com/s/ftm9deaq4tqflzjxwhmboqy9q6c9dxpu)
+* The message stimuli can be found [here](https://upenn.box.com/s/h3vhnqbdmp383rvahnaalas20cqz7u5g)
+
+Note that the MIDs have been scrambled in the raw qualtrics data to deidentify them. Scrambling was conducted using the following code:
+
+```
+read.csv("covid19_study1_qualtrics.csv", stringsAsFactors = FALSE) %>% 
+  mutate(MID = stringi::stri_rand_shuffle(MID)) %>%
+  write.csv("covid19_study1_qualtrics.csv", row.names = FALSE)
+```
+
+This code tidies the raw data and outputs a dataframe in the long format with the following columns:
+
+`study` = study name  
+`condition` = experimental group (no message control, message control, norm, autonomous, mocking)  
+`survey_name` = name of the survey or question category (e.g. intentions or SES)  
+`item` = individual survey item (or message rating) name  
+`value` = response or rating  
+
+```{r}
+# load state codes
+states = read.csv("state_codes.csv", stringsAsFactors = FALSE) %>%
+  mutate(state_code = as.character(state_code))
+
+# load message info
+message_info = read.csv("message_info.csv", stringsAsFactors = FALSE) %>%
+  rename("message_text" = text) %>%
+  mutate(condition = gsub(" ", "", condition),
+         condition = tolower(condition),
+         condition = ifelse(condition == "control", "message control",
+                     ifelse(condition == "descriptivenorm", "norm",
+                     ifelse(condition == "humor(mocking)", "mocking", condition)))) %>%
+  mutate(message = sprintf("msg_%02d", as.numeric(image_number))) %>%
+  filter(message %in% c("msg_06", "msg_07", "msg_08", "msg_09", "msg_10", 
+                        "msg_12", "msg_15", "msg_17", "msg_18", "msg_20", 
+                        "msg_23", "msg_24", "msg_25", "msg_31", "msg_32")) %>%
+  mutate(behavior = "social_distancing") %>%
+  select(condition, message, message_text, behavior)
+
+# load and tidy survey
+surveys = read.csv("covid19_study1_qualtrics.csv", stringsAsFactors = FALSE) %>%
+  slice(3:n()) %>%
+  filter(!DistributionChannel == "preview") %>% # remove preview responses
+  filter(!mturk_code == "") %>% # remove participants who failed screener
+  filter(!MID == "" | StartDate == "") %>% # remove test responses
+  rename("dehumanization_1" = dehumanization_10, # rename slider variables and state
+         "dehumanization_2" = dehumanization_11,
+         "dehumanization_3" = dehumanization_12,
+         "dehumanization_4" = dehumanization_13,
+         "dehumanization_5" = dehumanization_14,
+         "dehumanization_6" = dehumanization_15,
+         "dehumanization_7" = dehumanization_16,
+         "dehumanization_8" = dehumanization_17,
+         "dehumanization_9" = dehumanization_18,
+         "dehumanization_10" = dehumanization_19,
+         "dehumanization_11" = dehumanization_20,
+         "state_code" = state,
+         "msg_time_pre" = pre_msg_time,
+         "msg_time_post"= post_msg_time) %>%
+  left_join(., states, by = "state_code") %>% # replace state code with name
+  select(-state_code) %>%
+  mutate(SID = sprintf("s%04d", row_number())) %>% # create unique SID
+  gather(var, val, starts_with("X")) %>%
+  extract(var, c("message", "condition", "question"), "X([0-9]+)_(.*)_(msg.*)", remove = FALSE) %>% #rename conditions
+  mutate(group = ifelse(group == "norms", "norm", group),
+         condition = ifelse(condition == "a", "autonomous",
+                     ifelse(condition == "n", "norm",
+                     ifelse(condition == "c", "control", 
+                     ifelse(condition == "m", "mocking", condition)))),
+         message = recode(message, "1" = "06", "4" = "07", "5" = "08", # recode messages to match those in message_info.csv
+                                   "6" = "09", "7" = "10", "8" = "12",
+                                   "9" = "15", "10" = "17", "11" = "18",
+                                   "12" = "20", "13" = "23", "14" = "24",
+                                   "15" = "25", "16" = "31", "17" = "32"),
+         var = sprintf("%s_%s_%s", condition, question, message)) %>%
+  select(-c(message, condition, question, MID), -contains(".stims")) %>%
+  spread(var, val) %>%
+  gather(item, value, -c(SID, group)) %>%
+  mutate(value = ifelse(value == "", NA, value)) %>%
+  extract(item, "survey_name", "(.*)_[0-9]+", remove = FALSE) %>%
+  mutate(survey_name = ifelse(is.na(survey_name), item, survey_name)) %>%
+  rename("condition" = group)
+
+# get completed messages and remove condition info
+messages = surveys %>%
+  filter(grepl("msg", item)) %>%
+  filter(!is.na(value)) %>%
+  mutate(item = gsub("(.*)_msg", "msg", item),
+         survey_name = gsub("(.*)_msg", "msg", survey_name))
+
+# replace messages 
+surveys_merged = surveys %>%
+  filter(!grepl("msg", item)) %>% # remove message ratings
+  bind_rows(messages) %>% # replace message ratings with cleaned message ratings
+  mutate(study = "study1") %>%
+  select(study, condition, SID, survey_name, item, value)
+
+# spread to wide format
+surveys_merged_wide = surveys_merged %>%
+  select(-survey_name) %>%
+  spread(item, value)
+```
+
+Number of participants before exclusions = `r nrow(surveys_merged_wide)`
+
+## quality checks
+### failed checks
+* Many more people failed the flattening the curve question than the COVID-19 or social distancing questions
+* Because the survey emphasizes COVID-19 and social distancing, let's just use those items to determine failed checks
+* The correct answer for the English check is the school bus, but let's be lenient and accept the truck as well
+
+```{r}
+# identify failed attention checks
+failed_attn = surveys %>%
+  filter(item == "attention_2" & !grepl("How do you feel about social media?", value)) %>%
+  select(SID, value) %>%
+  unique()
+
+# identify failed knowledge checks
+failed_covid_qs = surveys %>%
+  select(-survey_name) %>%
+  filter(grepl("knowledge|^code", item)) %>%
+  spread(item, value) %>%
+  gather(item, value, starts_with("knowledge")) %>%
+  mutate(failed = ifelse(item == "knowledge_covid" & SID %in% c("s0873", "s0935", "s0047", "s0199", "s0626", "s0842", "s0417", "s0768", "s0821"), 1,
+                  # ifelse(item == "knowledge_flatten" & SID %in% c("s0002", "s0064", "s0170", "s0047", "s0045", "s0199", "s0071", "s0094", "s0221",
+                  #                                                "s0297", "s0354", "s0400", "s0430", "s0476", "s0490", "s0507", "s0513", "s0522",
+                  #                                                "s0575", "s0621", "s0626", "s0657", "s0666", "s0675", "s0685", "s0695", "s0705",
+                  #                                                "s0708", "s0723", "s0732", "s0768", "s0769", "s0790", "s0794", "s0812", "s0821",
+                  #                                                "s0825", "s0842", "s0844", "s0873", "s0875", "s0889", "s0913", "s0935", "s0939",
+                  #                                                "s0946", "s0958", "s1006", "s1014", "s1020", "s1038", "s1091", "s1094", "s1101"), 1,
+                  ifelse(item == "knowledge_social" & SID %in% c("s0002", "s0047", "s0199", "s0221", "s0297", "s0430", "s0476", "s0575", "s0626", 
+                                                                  "s0666", "s0685", "s0754", "s0768", "s0794", "s0808", "s0821", "s0842", "s0844", 
+                                                                  "s0851", "s0873", "s0889", "s0935", "s1020", "s1020", "s1101"), 1, 0))) %>%
+  select(SID, item, failed) %>%
+  unique() %>%
+  group_by(SID) %>%
+  summarize(n_knowledge_failed = sum(failed))
+
+failed_covid_subs = failed_covid_qs %>%
+  filter(n_knowledge_failed > 0)
+
+# identify failed English checks
+failed_english = surveys %>%
+  filter(item == "english") %>%
+  filter(!grepl("bus|truck", tolower(value)) | SID %in% c("s0066", "s0161", "s0221", "s0564", "s0612")) %>% #these participants copied the sentence
+  select(SID, value) %>%
+  unique()
+
+# print number of failed checks
+failed = surveys %>% 
+  select(SID) %>% 
+  unique() %>% 
+  mutate(`failed attention` = ifelse(SID %in% failed_attn$SID, 1, 0), 
+         `failed english` = ifelse(SID %in% failed_english$SID, 1, 0), 
+         `failed covid qs` = ifelse(SID %in% failed_covid_subs$SID, 1, 0),
+         `failed english & attention` = ifelse(`failed attention` == 1 & `failed english` == 1, 1, 0),
+         `failed english & covid qs` = ifelse(`failed english` == 1 & `failed covid qs` == 1, 1, 0),
+         `failed attention & covid qs` = ifelse(`failed attention` == 1 & `failed covid qs` == 1, 1, 0),
+         `failed attention & covid & english` = ifelse(`failed attention` == 1 & `failed covid qs` == 1 & `failed english` == 1, 1, 0),
+         `failed at least one check`  = ifelse(`failed attention` == 1 | `failed covid qs` == 1 | `failed english`, 1, 0))
+
+failed %>%
+  gather(check, val, contains("fail")) %>% 
+  filter(val == 1) %>% 
+  group_by(check) %>% 
+  summarize(n = n(),
+            `%` = round(n / nrow(failed_covid_qs) * 100, 1)) %>%
+  arrange(desc(n)) %>%
+  kable(format = "pandoc")
+```
+
+### durations
+#### timer cumulative
+```{r}
+timers_pre = surveys %>%
+  select(-survey_name) %>%
+  filter(grepl("pre_|msg_.*_pre|Duration", item)) %>%
+  mutate(value = as.numeric(value),
+         item = gsub("randomizer1", "randomizer_dvs", item),
+         item = gsub("randomizer2", "randomizer_covs_all", item),
+         item = gsub("randomizer3", "randomizer_covs_bundles", item)) %>%
+  spread(item, value) %>%
+  group_by(SID) %>%
+  fill(Duration..in.seconds., .direction = "down") %>%
+  gather(item, value, contains("time")) %>%
+  group_by(item) %>%
+  mutate(median_value = median(value, na.rm = TRUE),
+         order = ifelse(item == "msg_time_pre", 1,
+                 ifelse(item == "pre_intentions_time", 2,
+                 ifelse(item == "pre_norms_time", 3,
+                 ifelse(item == "pre_beliefs_time", 4,
+                 ifelse(item == "pre_randomizer_dvs_time", 5,
+                 ifelse(item == "pre_randomizer_covs_all_time", 6,
+                 ifelse(item == "pre_randomizer_covs_bundles_time", 7,
+                 ifelse(item == "pre_demographics_time", 8,
+                 ifelse(item == "pre_employment_time", 9, 
+                 ifelse(item == "pre_SES_time", 10,
+                 ifelse(item == "pre_code_time", 11, 12)))))))))))) %>%
+  arrange(SID, order)
+
+timers_pre %>%
+  mutate(duration = sprintf("%s (%s mins)", SID, round(as.numeric(Duration..in.seconds.) / 60, 0))) %>%
+  ggplot(aes(reorder(item, order), value / 60)) +
+  geom_line(aes(group =  duration, color = duration), size = .5, alpha = .1) +
+  geom_line(aes(group =  duration, y = median_value / 60), color = "black") +
+  scale_y_continuous(breaks = seq(0, 120, 10)) +
+  coord_cartesian(ylim = c(0, 120)) +
+  labs(y = "durations (mins)", x = "") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+#### overall durations
+```{r, fig.width = 12, fig.height=4}
+durations = surveys %>%
+  filter(item == "Duration..in.seconds.") %>%
+  mutate(duration_mins = as.numeric(value) / 60,
+         less_than_10_mins = ifelse(duration_mins < 10, 1, 0))
+
+# responses excluding s0962 (1473 mins)
+dur_plot_data = durations %>%
+  filter(!SID == "s0962") %>%
+  mutate(n = n(),
+         median = median(duration_mins, na.rm = TRUE),
+         sd3 = median + (3 * sd(duration_mins, na.rm = TRUE)),
+         slow = ifelse(duration_mins > (median + sd3), 1, 0))
+
+dur_plot_data %>%
+  ggplot(aes(duration_mins)) +
+  geom_histogram(alpha = .5) +
+  geom_freqpoly() +
+  geom_vline(aes(xintercept = median)) +
+  geom_vline(aes(xintercept = sd3), linetype = "dotted") +
+  annotate("text", label = sprintf("Median = %s", round(unique(dur_plot_data$median), 1)), x = unique(dur_plot_data$median) + 10, y = 175) + 
+  annotate("text", label = sprintf("3 SD = %s", round(unique(dur_plot_data$sd3), 1)), x = unique(dur_plot_data$sd3) + 10, y = 175) + 
+  labs(x = "duration (minutes)") +
+  theme_minimal()
+```
+
+#### print survey data for participants with durations < 10 mins
+```{r}
+fast_subs = durations %>%
+  filter(less_than_10_mins == 1)
+
+surveys_merged_wide %>% 
+  filter(SID %in% fast_subs$SID) %>%
+  left_join(., select(durations, SID, duration_mins)) %>%
+  select(SID, duration_mins, everything()) %>%
+  select(-study, -condition) %>%
+  mutate(duration_mins = round(duration_mins, 1)) %>%
+  arrange(duration_mins) %>%
+  DT::datatable(rownames = FALSE, extensions = 'FixedColumns', options = list(scrollX = TRUE,
+                                                                              scrollY = TRUE,
+                                                                              fixedColumns = list(leftColumns = 2)))
+```
+
+### invariance
+Goal is to identify participants who are responding the same way across all items within a survey
+
+* Calculate the SD for each surevy for each individual
+* Single item scales are not included
+* If SD = 0, code as invariant and calculate the percentage of invariant surveys for each participant
+
+```{r, fig.width = 8}
+invariance = surveys %>%
+  select(SID, survey_name, value) %>%
+  group_by(SID, survey_name) %>%
+  summarize(sd_survey = sd(as.numeric(value), na.rm = TRUE)) %>%
+  filter(!is.na(sd_survey)) %>%
+  group_by(SID) %>%
+  mutate(completed_variance = ifelse(!(is.na(sd_survey) | is.nan(sd_survey)), 1, 0),
+         n_survey = sum(completed_variance, na.rm = TRUE),
+         invariant = ifelse(sd_survey == 0, 1, 0),
+         sum_invariant = sum(invariant, na.rm = TRUE),
+         percent_surveys_invariant = (sum_invariant / n_survey ) * 100) %>%
+  select(SID, survey_name, sd_survey, percent_surveys_invariant) %>%
+  ungroup() %>%
+  select(SID, percent_surveys_invariant) %>%
+  unique() %>%
+  mutate(median = median(percent_surveys_invariant, na.rm = TRUE),
+         uppersd2 = median + (2 * sd(percent_surveys_invariant, na.rm = TRUE)),
+         uppersd3 = median + (3 * sd(percent_surveys_invariant, na.rm = TRUE)),
+         greater_than_2sd_invariance = ifelse(percent_surveys_invariant > uppersd2, 1, 0),
+         greater_than_3sd_invariance = ifelse(percent_surveys_invariant > uppersd3, 1, 0))
+
+invariance %>%
+  ggplot(aes(percent_surveys_invariant)) +
+    geom_histogram(alpha = .5) +
+    geom_freqpoly() +
+    geom_vline(aes(xintercept = median)) +
+    annotate("text", label = sprintf("Median = %s", round(unique(invariance$median), 1)), 
+             x = unique(invariance$median) + 5, y = 145, size = 2.5) + 
+    geom_vline(aes(xintercept = uppersd2), linetype = "dotted") +
+    annotate("text", label = sprintf("+2 SD = %s", round(unique(invariance$uppersd2), 1)), 
+             x = unique(invariance$uppersd2) + 5, y = 145, size = 2.5) + 
+    geom_vline(aes(xintercept = uppersd3), linetype = "dotted") +
+    annotate("text", label = sprintf("+3 SD = %s", round(unique(invariance$uppersd3), 1)), 
+             x = unique(invariance$uppersd3) + 5, y = 145, size = 2.5) + 
+    scale_x_continuous(breaks = seq(0, 100, 10)) +
+    scale_y_continuous(breaks = seq(0, 140, 20)) +
+    labs(x = "percent invariance across surveys") +
+    theme_minimal()
+```
+
+#### print survey data for participants with invariance > 2 SDs from the median
+* For a quick check of invariance, look at the agency scale: agency_2 = reverse-coded
+
+```{r}
+invariant_subs = invariance %>%
+  filter(greater_than_2sd_invariance == 1)
+
+surveys_merged_wide %>% 
+  filter(SID %in% invariant_subs$SID) %>%
+  left_join(., select(invariance, SID, percent_surveys_invariant)) %>%
+  select(SID, percent_surveys_invariant, everything()) %>%
+  select(-study, -condition) %>%
+  mutate(percent_surveys_invariant = round(percent_surveys_invariant, 1)) %>%
+  arrange(desc(percent_surveys_invariant)) %>%
+  rename("% invariant" = percent_surveys_invariant) %>%
+  DT::datatable(rownames = FALSE, extensions = 'FixedColumns', options = list(scrollX = TRUE,
+                                                                              scrollY = TRUE,
+                                                                              fixedColumns = list(leftColumns = 2)))
+```
+
+#### print survey data for participants with invariance > 3 SDs from the median
+* For a quick check of invariance, look at the agency scale: agency_2 = reverse-coded
+
+```{r}
+invariant_subs = invariance %>%
+  filter(greater_than_3sd_invariance == 1)
+
+surveys_merged_wide %>% 
+  filter(SID %in% invariant_subs$SID) %>%
+  left_join(., select(invariance, SID, percent_surveys_invariant)) %>%
+  select(SID, percent_surveys_invariant, everything()) %>%
+  select(-study, -condition) %>%
+  mutate(percent_surveys_invariant = round(percent_surveys_invariant, 1)) %>%
+  arrange(desc(percent_surveys_invariant)) %>%
+  rename("% invariant" = percent_surveys_invariant) %>%
+  DT::datatable(rownames = FALSE, extensions = 'FixedColumns', options = list(scrollX = TRUE,
+                                                                              fixedColumns = list(leftColumns = 1)))
+```
+
+### combine quality indicators
+Quality indicators:
+
+* Failed attention, English, and COVID-10 knowledge checks
+* Duration < 10 mins
+* Invariance > 3 SDs from the median
+
+```{r}
+quality_check_all = durations %>%
+  select(SID, duration_mins, less_than_10_mins) %>%
+  left_join(., select(invariance, SID, percent_surveys_invariant, greater_than_3sd_invariance)) %>%
+  left_join(., select(failed, SID, `failed attention`, `failed english`, `failed covid qs`)) %>%
+  gather(var, val, contains("fail"), contains("than")) %>%
+  group_by(SID) %>%
+  mutate(n_indicators = sum(val),
+         duration_mins = round(duration_mins, 1),
+         percent_surveys_invariant = round(percent_surveys_invariant, 1)) %>%
+  spread(var, val) %>% 
+  filter(n_indicators > 0) %>%
+  rename("invariance >3 SD" = greater_than_3sd_invariance,
+         "duration < 10 mins" = less_than_10_mins) %>%
+  arrange(desc(n_indicators)) 
+
+quality_check_notime = durations %>%
+  select(SID, duration_mins) %>%
+  left_join(., select(invariance, SID, percent_surveys_invariant, greater_than_3sd_invariance)) %>%
+  left_join(., select(failed, SID, `failed attention`, `failed english`, `failed covid qs`)) %>%
+  gather(var, val, contains("fail"), contains("than")) %>%
+  group_by(SID) %>%
+  mutate(n_indicators = sum(val),
+         duration_mins = round(duration_mins, 1),
+         percent_surveys_invariant = round(percent_surveys_invariant, 1)) %>%
+  spread(var, val) %>% 
+  filter(n_indicators > 0) %>%
+  rename("invariance >3 SD" = greater_than_3sd_invariance) %>%
+  arrange(desc(n_indicators)) 
+
+quality_check_failed = failed %>%
+  filter(`failed at least one check` == 1)
+
+quality_check_all %>%
+  DT::datatable(filter = "top", rownames = FALSE, extensions = 'FixedColumns', 
+                options = list(scrollX = TRUE, fixedColumns = list(leftColumns = 2)))
+```
+
+Excluding all these participants results in excluding `r round(nrow(quality_check_all) / nrow(durations) * 100, 1)`% of participants (n = `r nrow(quality_check_all)`)
+
+Removing the duration as an exclusion criteria results in excluding `r round(nrow(quality_check_notime) / nrow(durations) * 100, 1)`% of participants (n = `r nrow(quality_check_notime)`)
+
+Just excluding based on failed checks results in excluding `r round(nrow(quality_check_failed) / nrow(durations) * 100, 1)`% of participants (n = `r nrow(quality_check_failed)`)
+
+
+## exclude participants
+
+Participants are excluded for:
+
+* Failing the attention check
+* Failing the English comprehension check (with lenient scoring to include either the truck or the school bus as correct)
+* Failing one or more of the COVID-19 questions (only COVID-19 and social distancing items)
+* Having invariance > 3 SDs from the median across people
+
+```{r}
+# filter failed attn check and replace messages 
+surveys_clean = surveys_merged %>%
+  filter(!SID %in% quality_check_notime$SID) %>% # exclude participants
+  select(study, condition, SID, survey_name, item, value)
+
+# spread to wide format
+surveys_wide = surveys_clean %>%
+  select(-survey_name) %>%
+  spread(item, value)
+```
+
+# summarize condition and survey ns
+```{r}
+surveys_clean %>%
+  group_by(condition) %>%
+  select(SID, condition) %>%
+  unique() %>%
+  summarize(n = n())
+
+surveys_clean %>%
+  filter(!is.na(value)) %>%
+  group_by(condition, survey_name) %>%
+  select(SID, condition, survey_name) %>%
+  unique() %>%
+  summarize(n = n()) %>%
+  spread(condition, n) %>%
+  mutate(total = rowSums(.[,2:6], na.rm = TRUE)) %>%
+  DT::datatable(filter = "top", rownames = FALSE)
+```
+
+# check scale ranges
+## across all conditions
+```{r}
+surveys_clean %>%
+  mutate(value = as.numeric(value)) %>% # all non-numeric values will be NA
+  filter(!is.na(value)) %>%
+  group_by(item) %>%
+  summarize(min = round(min(value), 2),
+            max = round(max(value), 2),
+            mean = round(mean(value), 2),
+            var = round(var(value), 2)) %>%
+  DT::datatable(filter = "top", rownames = FALSE)
+```
+
+## for each condition separately
+```{r}
+surveys_clean %>%
+  mutate(value = as.numeric(value)) %>% # all non-numeric values will be NA
+  filter(!is.na(value)) %>%
+  group_by(item, condition) %>%
+  summarize(min = round(min(value), 2),
+            max = round(max(value), 2),
+            mean = round(mean(value), 2),
+            var = round(var(value), 2)) %>%
+  DT::datatable(filter = "top", rownames = FALSE)
+```
+
+# write csvs
+```{r}
+write.csv(surveys_clean, "covid19_study1_clean_long.csv", row.names = FALSE)
+write.csv(surveys_wide, "covid19_study1_clean_wide.csv", row.names = FALSE)
+```
+
