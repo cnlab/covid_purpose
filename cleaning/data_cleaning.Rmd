@@ -62,7 +62,7 @@ states = read.csv("state_codes.csv", stringsAsFactors = FALSE) %>%
   mutate(state_code = as.character(state_code))
 
 # load message info
-message_info = read.csv("message_info.csv", stringsAsFactors = FALSE) %>%
+message_info = read.csv("../../../covid19-message-framing-private/covid19_study1/message_info.csv", stringsAsFactors = FALSE) %>%
   rename("message_text" = text) %>%
   mutate(condition = gsub(" ", "", condition),
          condition = tolower(condition),
@@ -77,7 +77,7 @@ message_info = read.csv("message_info.csv", stringsAsFactors = FALSE) %>%
   select(condition, message, message_text, behavior)
 
 # load and tidy survey
-surveys = read.csv("covid19_study1_qualtrics.csv", stringsAsFactors = FALSE) %>%
+surveys = read.csv("../../../covid19-message-framing-private/covid19_study1/covid19_study1_qualtrics.csv", stringsAsFactors = FALSE) %>%
   slice(3:n()) %>%
   filter(!DistributionChannel == "preview") %>% # remove preview responses
   filter(!mturk_code == "") %>% # remove participants who failed screener
@@ -432,6 +432,30 @@ Excluding all these participants results in excluding `r round(nrow(quality_chec
 Removing the duration as an exclusion criteria results in excluding `r round(nrow(quality_check_notime) / nrow(durations) * 100, 1)`% of participants (n = `r nrow(quality_check_notime)`)
 
 Just excluding based on failed checks results in excluding `r round(nrow(quality_check_failed) / nrow(durations) * 100, 1)`% of participants (n = `r nrow(quality_check_failed)`)
+
+## purpose paper exclusions only
+```{r}
+purpose = surveys_merged %>%
+  filter(grepl("lonely|purpose", item)) %>%
+  select(-survey_name) %>%
+  spread(item, value) %>%
+  filter(!(is.na(lonely_current) & is.na(purpose_1) & is.na(purpose_2)))
+
+quality_check_notime %>%
+  filter(SID %in% purpose$SID) %>%
+  select(SID, n_indicators, `failed attention`, `failed covid qs`, `failed english`, `invariance >3 SD`) %>%
+  filter(n_indicators > 1)
+
+quality_check_notime %>%
+  filter(SID %in% purpose$SID) %>%
+  select(SID, n_indicators, `failed attention`, `failed covid qs`, `failed english`, `invariance >3 SD`) %>%
+  filter(n_indicators == 1) %>%
+  select(-n_indicators) %>%
+  gather(variable, value, -SID) %>%
+  filter(value == 1) %>%
+  group_by(variable) %>%
+  summarize(n = n())
+```
 
 
 ## exclude participants
