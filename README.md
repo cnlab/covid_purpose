@@ -9,7 +9,8 @@ Age and purpose in life moderate the link between loneliness and protective heal
 
 ```
 ├── analysis
-│   └── analysis_code.R
+    ├── analysis_code.Rmd
+    └── analysis_code.html
 └── cleaning
     ├── data_cleaning.Rmd
     └── state_codes.csv
