@@ -471,7 +471,9 @@ Participants are excluded for:
 # filter failed attn check and replace messages 
 surveys_clean = surveys_merged %>%
   filter(!SID %in% quality_check_notime$SID) %>% # exclude participants
-  select(study, condition, SID, survey_name, item, value)
+  select(study, condition, SID, survey_name, item, value) %>%
+  filter(SID %in% purpose$SID) %>% # select only participants who received the purpose and loneliness items
+  filter(grepl("purpose|intentions1|norms_close1|beliefs_norms|beliefs_safe|ses_subj|lonely|house_size_curre|^age$|gender|race", item)) # subset relevant variables
 
 # spread to wide format
 surveys_wide = surveys_clean %>%
@@ -527,7 +529,7 @@ surveys_clean %>%
 
 # write csvs
 ```{r}
-write.csv(surveys_clean, "covid19_study1_clean_long.csv", row.names = FALSE)
-write.csv(surveys_wide, "covid19_study1_clean_wide.csv", row.names = FALSE)
+write.csv(surveys_clean, "../data/data_clean_long.csv", row.names = FALSE)
+write.csv(surveys_wide, "../data/data_clean_wide.csv", row.names = FALSE)
 ```
 

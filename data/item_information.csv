@@ -1,0 +1,57 @@
+item,text,scale,measure,citation
+norms_close1_text,"For these questions, think about your closest friends and family. What proportion of them will do the following things in the next two weeks?",,,
+norms_close1_1,Wash their hands for at least 20 seconds with soap and warm water each time they wash them,0-100%,Norms close others: hygiene,
+norms_close1_2,"Stay home and avoid all social contact, even if they aren't sick",0-100%,Norms close others: social distancing,
+norms_close1_3,Stay home if they're sick,0-100%,Norms close others: social distancing,
+norms_close1_4,Limit their grocery shopping to once a week or less,0-100%,Norms close others: social distancing,
+norms_close1_5,Work from home every day they need to work,0-100%,Norms close others: social distancing,
+norms_close1_6,Stay at least 6 feet apart from others when they're in public,0-100%,Norms close others: social distancing,
+norms_close1_7,Touch commonly used surfaces (e.g. doorknobs) with their hands when they're in public,0-100%,Norms close others: hygiene,
+norms_close1_8,Touch their face when they're in public,0-100%,Norms close others: hygiene,
+norms_close1_9,Shake hands when they meet others,0-100%,Norms close others: hygiene,
+norms_close1_10,"Avoid all public gatherings, even if they aren't sick",0-100%,Norms close others: social distancing,
+intentions1_text,Please rate how much you intend to do the following things over the next two weeks.,,,
+intentions1_1,Wash my hands for at least 20 seconds with soap and warm water each time I wash them,"1 = definitely will not, 7 = definitely will",Intentions: hygiene,
+intentions1_2,"Stay home and avoid all social contact, even if I'm not sick","1 = definitely will not, 7 = definitely will",Intentions: social distancing,
+intentions1_3,Stay home if I'm sick,"1 = definitely will not, 7 = definitely will",Intentions: social distancing,
+intentions1_4,Limit my grocery shopping to once a week or less,"1 = definitely will not, 7 = definitely will",Intentions: social distancing,
+intentions1_5,Work from home every day I need to work,"1 = definitely will not, 7 = definitely will",Intentions: social distancing,
+intentions1_6,Stay at least 6 feet apart from others when I'm in public,"1 = definitely will not, 7 = definitely will",Intentions: social distancing,
+intentions1_7,Touch commonly used surfaces (e.g. doorknobs) with my hands when I'm in public,"1 = definitely will not, 7 = definitely will",Intentions: hygiene,
+intentions1_8,Touch my face when I'm in public,"1 = definitely will not, 7 = definitely will",Intentions: hygiene,
+intentions1_9,Shake hands when I meet others,"1 = definitely will not, 7 = definitely will",Intentions: hygiene,
+intentions1_10,"Avoid all public gatherings, even if I'm not sick","1 = definitely will not, 7 = definitely will",Intentions: social distancing,
+beliefs_norms_1,It will be awkward to avoid my friends.,"1 = strongly disagree, 7 = strongly agree",Beliefs: social norms,
+beliefs_norms_2,My family will approve of my decision.,"1 = strongly disagree, 7 = strongly agree",Beliefs: social norms,
+beliefs_norms_3,My friends will approve of my decision.,"1 = strongly disagree, 7 = strongly agree",Beliefs: social norms,
+beliefs_norms_4,People I work with will approve of my decision.,"1 = strongly disagree, 7 = strongly agree",Beliefs: social norms,
+beliefs_safe_self_1,I will avoid coming in contact with coronavirus.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting onself,
+beliefs_safe_self_2,I will be less likely to get COVID-19.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting onself,
+beliefs_safe_self_3,I will be less likely to get sick.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting onself,
+beliefs_safe_self_4,I will keep myself safe.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting onself,
+beliefs_safe_self_5,I will be able to take care of myself.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting onself,
+beliefs_safe_others_1,I will keep my family safe.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting others,
+beliefs_safe_others_2,I will keep people in my community safe.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting others,
+beliefs_safe_others_3,I will prevent others from getting COVID-19.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting others,
+beliefs_safe_others_4,I will protect more vulnerable people in our society.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting others,
+beliefs_safe_others_5,I will slow the spread of COVID-19.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting others,
+beliefs_safe_others_6,It will be good for society.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting others,
+beliefs_safe_others_7,It will help stop the spread of COVID-19.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting others,
+beliefs_safe_others_8,It will help the healthcare system from being over flooded and enable people who need urgent medical care to receive it.,"1 = strongly disagree, 7 = strongly agree",Beliefs: protecting others,
+purpose_text,Please indicate the extent to which you agree with the following statements.,,Purpose in life,"Adapted from Ryff, 1989"
+purpose_1,I enjoy making plans for the future and working to make them a reality.,"1 = strongly disagree, 6 = strongly agree",Purpose in life,"Adapted from Ryff, 1989"
+purpose_2,My daily activities often seem trivial and unimportant to me.,"1 = strongly disagree, 6 = strongly agree",Purpose in life,"Adapted from Ryff, 1989"
+purpose_3,I am an active person in carrying out the plans I set for myself.,"1 = strongly disagree, 6 = strongly agree",Purpose in life,"Adapted from Ryff, 1989"
+purpose_4,I don't have a good sense of what it is I'm trying to accomplish in life.,"1 = strongly disagree, 6 = strongly agree",Purpose in life,"Adapted from Ryff, 1989"
+purpose_5,I sometimes feel as if I've done all there is to do in life.,"1 = strongly disagree, 6 = strongly agree",Purpose in life,"Adapted from Ryff, 1989"
+purpose_6,I live life one day at a time and don’t really think about the future.,"1 = strongly disagree, 6 = strongly agree",Purpose in life,"Adapted from Ryff, 1989"
+purpose_7,I have a sense of direction and purpose in my life.,"1 = strongly disagree, 6 = strongly agree",Purpose in life,"Adapted from Ryff, 1989"
+purpose_8,My purpose in life is to benefit myself.,"1 = strongly disagree, 6 = strongly agree",Purpose in life,"Adapted from Ryff, 1989"
+purpose_9,My purpose in life is to benefit others.,"1 = strongly disagree, 6 = strongly agree",Purpose in life,"Adapted from Ryff, 1989"
+age,How old are you?,free response,Age,
+gender,What is your gender?,"1 = male, 2 = female, 3 = other, 4 = would rather not say",Gender,
+race,What race or races do you consider yourself to be?,"1 = White, 2 = Black or African American, 3 = Asian, 4 = American Indian or Alaska Native, 4 = Native Hawaiian or Other Pacific Islanders, 5 = Other",Race,
+ses_subj,"Think of this ladder as representing where people stand in the United States. At the top of the ladder are the people who have the most money, the most education, and the most respected jobs. At the bottom are the people who have the least money, least education, and the least respected jobs or no job. Relative to other people in the United States right now, where would you place yourself on this ladder?Click the rung that best matches your position.","1 = worse off in the US, 10 = best off in the US",Subjective Social Status,MacArthur Scale of Subjective Social Status
+lonely_current,"Currently, how lonely are you?","1 = not lonely at all, 7 = very lonely",Current loneliness,
+lonely_prior,"Prior to the outbreak of COVID-19, how lonely were you?","1 = not lonely at all, 7 = very lonely",Pre-pandemic loneliness,
+house_size_curre,"Currently, how many people live in your household?",free response,Current household size,

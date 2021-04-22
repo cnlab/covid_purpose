@@ -9,9 +9,9 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Yoona Kang" />
+<meta name="author" content="Yoona Kang &amp; Dani Cosme" />
 
-<meta name="date" content="2021-04-21" />
+<meta name="date" content="2021-04-22" />
 
 <title>Manuscript Analyses</title>
 
@@ -2947,22 +2947,22 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Manuscript Analyses</h1>
-<h4 class="author">Yoona Kang</h4>
-<h4 class="date">2021-04-21</h4>
+<h4 class="author">Yoona Kang &amp; Dani Cosme</h4>
+<h4 class="date">2021-04-22</h4>
 
 </div>
 
 
 <div id="load-packages" class="section level1">
 <h1>load packages</h1>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(<span class="st">&quot;lme4&quot;</span>)</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(<span class="st">&quot;lmerTest&quot;</span>)</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">library</span>(<span class="st">&quot;ggplot2&quot;</span>)</span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">library</span>(<span class="st">&quot;Rcpp&quot;</span>)</span>
-<span id="cb1-5"><a href="#cb1-5"></a><span class="kw">library</span>(<span class="st">&quot;lm.beta&quot;</span>)</span>
-<span id="cb1-6"><a href="#cb1-6"></a><span class="kw">library</span>(<span class="st">&quot;psych&quot;</span>)</span>
-<span id="cb1-7"><a href="#cb1-7"></a><span class="kw">library</span>(<span class="st">&#39;knitr&#39;</span>)</span>
-<span id="cb1-8"><a href="#cb1-8"></a><span class="kw">library</span>(<span class="st">&#39;tidyverse&#39;</span>)</span>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(lme4)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="kw">library</span>(lmerTest)</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="kw">library</span>(ggplot2)</span>
+<span id="cb1-4"><a href="#cb1-4"></a><span class="kw">library</span>(Rcpp)</span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="kw">library</span>(lm.beta)</span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="kw">library</span>(psych)</span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="kw">library</span>(knitr)</span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="kw">library</span>(tidyverse)</span>
 <span id="cb1-9"><a href="#cb1-9"></a><span class="kw">library</span>(interactions)</span>
 <span id="cb1-10"><a href="#cb1-10"></a><span class="kw">library</span>(dplyr)</span>
 <span id="cb1-11"><a href="#cb1-11"></a><span class="kw">library</span>(tidyr)</span>
@@ -2970,7 +2970,7 @@ div.tocify {
 </div>
 <div id="load-data" class="section level1">
 <h1>load data</h1>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>df &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&#39;covid19_study1_clean_wide.csv&#39;</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>df &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&#39;../data/data_clean_wide.csv&#39;</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>)</span></code></pre></div>
 </div>
 <div id="clean-data" class="section level1">
 <h1>clean data</h1>
@@ -3681,21 +3681,21 @@ div.tocify {
 ## Reliability analysis   
 ## Call: alpha(x = df_purpose)
 ## 
-##   raw_alpha std.alpha G6(smc) average_r S/N    ase mean   sd median_r
-##       0.81      0.81    0.85      0.38 4.4 0.0098  4.3 0.99     0.39
+##   raw_alpha std.alpha G6(smc) average_r S/N   ase mean   sd median_r
+##       0.81      0.81    0.85      0.38 4.4 0.013  4.3 0.99     0.39
 ## 
 ##  lower alpha upper     95% confidence boundaries
-## 0.79 0.81 0.83 
+## 0.79 0.81 0.84 
 ## 
 ##  Reliability if an item is dropped:
 ##            raw_alpha std.alpha G6(smc) average_r S/N alpha se var.r med.r
-## purpose_1       0.79      0.79    0.81      0.38 3.7   0.0108 0.038  0.45
-## purpose_2r      0.76      0.77    0.81      0.36 3.4   0.0126 0.043  0.39
-## purpose_3       0.80      0.80    0.83      0.39 3.9   0.0104 0.033  0.45
-## purpose_4r      0.75      0.76    0.79      0.34 3.1   0.0136 0.040  0.35
-## purpose_5r      0.81      0.82    0.84      0.43 4.5   0.0098 0.024  0.39
-## purpose_6r      0.79      0.79    0.82      0.39 3.9   0.0112 0.041  0.39
-## purpose_7       0.79      0.79    0.81      0.39 3.8   0.0105 0.030  0.39
+## purpose_1       0.79      0.79    0.81      0.38 3.7    0.014 0.038  0.45
+## purpose_2r      0.76      0.77    0.81      0.36 3.4    0.016 0.043  0.39
+## purpose_3       0.80      0.80    0.83      0.39 3.9    0.014 0.033  0.45
+## purpose_4r      0.75      0.76    0.79      0.34 3.1    0.018 0.040  0.35
+## purpose_5r      0.81      0.82    0.84      0.43 4.5    0.013 0.024  0.39
+## purpose_6r      0.79      0.79    0.82      0.39 3.9    0.014 0.041  0.39
+## purpose_7       0.79      0.79    0.81      0.39 3.8    0.014 0.030  0.39
 ## 
 ##  Item statistics 
 ##              n raw.r std.r r.cor r.drop mean  sd
@@ -3709,13 +3709,13 @@ div.tocify {
 ## 
 ## Non missing response frequency for each item
 ##               1    2    3    4    5    6 miss
-## purpose_1  0.01 0.05 0.09 0.23 0.36 0.25  0.4
-## purpose_2r 0.04 0.17 0.18 0.15 0.25 0.22  0.4
-## purpose_3  0.01 0.05 0.11 0.25 0.36 0.22  0.4
-## purpose_4r 0.08 0.15 0.15 0.12 0.23 0.26  0.4
-## purpose_5r 0.06 0.12 0.14 0.11 0.23 0.35  0.4
-## purpose_6r 0.08 0.13 0.17 0.18 0.24 0.20  0.4
-## purpose_7  0.04 0.07 0.10 0.22 0.33 0.23  0.4</code></pre>
+## purpose_1  0.01 0.05 0.09 0.23 0.36 0.25    0
+## purpose_2r 0.04 0.17 0.18 0.15 0.25 0.22    0
+## purpose_3  0.01 0.05 0.11 0.25 0.36 0.22    0
+## purpose_4r 0.08 0.15 0.15 0.12 0.23 0.26    0
+## purpose_5r 0.06 0.12 0.14 0.11 0.23 0.35    0
+## purpose_6r 0.08 0.13 0.17 0.18 0.24 0.20    0
+## purpose_7  0.04 0.07 0.10 0.22 0.33 0.23    0</code></pre>
 <div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1"></a>df_intention &lt;-<span class="st"> </span>df_raw[ , <span class="kw">c</span>(<span class="st">&quot;intentions1_1&quot;</span> , <span class="st">&quot;intentions1_2&quot;</span> , <span class="st">&quot;intentions1_3&quot;</span> , <span class="st">&quot;intentions1_4&quot;</span> , </span>
 <span id="cb60-2"><a href="#cb60-2"></a>                               <span class="st">&quot;intentions1_5&quot;</span> , <span class="st">&quot;intentions1_6&quot;</span> , <span class="st">&quot;intentions1_7r&quot;</span> ,  <span class="st">&quot;intentions1_8r&quot;</span> ,  </span>
 <span id="cb60-3"><a href="#cb60-3"></a>                               <span class="st">&quot;intentions1_9r&quot;</span> , <span class="st">&quot;intentions1_10&quot;</span>)]    </span>
@@ -3724,50 +3724,50 @@ div.tocify {
 ## Reliability analysis   
 ## Call: alpha(x = df_intention)
 ## 
-##   raw_alpha std.alpha G6(smc) average_r S/N   ase mean   sd median_r
-##       0.82      0.84    0.86      0.35 5.4 0.009  6.2 0.88     0.32
+##   raw_alpha std.alpha G6(smc) average_r S/N   ase mean  sd median_r
+##       0.82      0.84    0.86      0.35 5.3 0.012  6.1 0.9     0.32
 ## 
 ##  lower alpha upper     95% confidence boundaries
-## 0.8 0.82 0.84 
+## 0.79 0.82 0.84 
 ## 
 ##  Reliability if an item is dropped:
 ##                raw_alpha std.alpha G6(smc) average_r S/N alpha se var.r med.r
-## intentions1_1       0.80      0.83    0.85      0.35 4.8   0.0098 0.022  0.29
-## intentions1_2       0.80      0.82    0.84      0.34 4.7   0.0100 0.020  0.31
-## intentions1_3       0.81      0.84    0.85      0.36 5.1   0.0096 0.022  0.32
-## intentions1_4       0.80      0.83    0.85      0.35 4.9   0.0098 0.020  0.32
-## intentions1_5       0.83      0.85    0.86      0.39 5.7   0.0081 0.015  0.34
-## intentions1_6       0.80      0.82    0.83      0.33 4.5   0.0100 0.018  0.30
-## intentions1_7r      0.80      0.83    0.85      0.35 5.0   0.0102 0.018  0.32
-## intentions1_8r      0.80      0.83    0.84      0.35 4.9   0.0102 0.016  0.33
-## intentions1_9r      0.79      0.82    0.84      0.34 4.7   0.0107 0.017  0.31
-## intentions1_10      0.80      0.82    0.84      0.34 4.5   0.0101 0.019  0.31
+## intentions1_1       0.80      0.83    0.85      0.34 4.7    0.013 0.028  0.30
+## intentions1_2       0.79      0.82    0.84      0.34 4.5    0.013 0.024  0.30
+## intentions1_3       0.80      0.83    0.86      0.35 4.9    0.013 0.028  0.31
+## intentions1_4       0.80      0.83    0.85      0.35 4.8    0.013 0.024  0.33
+## intentions1_5       0.83      0.85    0.87      0.39 5.7    0.011 0.019  0.36
+## intentions1_6       0.79      0.81    0.84      0.33 4.4    0.014 0.023  0.30
+## intentions1_7r      0.80      0.83    0.85      0.36 5.0    0.013 0.023  0.36
+## intentions1_8r      0.80      0.83    0.84      0.35 4.9    0.013 0.020  0.36
+## intentions1_9r      0.78      0.82    0.84      0.34 4.6    0.015 0.023  0.30
+## intentions1_10      0.79      0.82    0.84      0.33 4.4    0.013 0.024  0.30
 ## 
 ##  Item statistics 
 ##                  n raw.r std.r r.cor r.drop mean   sd
-## intentions1_1  865  0.61  0.66  0.60   0.53  6.5 0.99
-## intentions1_2  865  0.66  0.69  0.66   0.56  6.2 1.28
-## intentions1_3  865  0.54  0.59  0.51   0.46  6.7 0.97
-## intentions1_4  865  0.61  0.65  0.60   0.51  6.2 1.28
-## intentions1_5  865  0.47  0.44  0.34   0.28  6.0 1.80
-## intentions1_6  865  0.69  0.75  0.73   0.63  6.5 0.96
-## intentions1_7r 865  0.69  0.62  0.58   0.55  5.3 1.92
-## intentions1_8r 865  0.69  0.63  0.60   0.56  5.7 1.81
-## intentions1_9r 865  0.73  0.69  0.67   0.62  6.2 1.71
-## intentions1_10 865  0.68  0.73  0.71   0.61  6.5 1.01
+## intentions1_1  517  0.62  0.66  0.60   0.54  6.5 1.04
+## intentions1_2  517  0.67  0.71  0.68   0.58  6.2 1.29
+## intentions1_3  517  0.57  0.62  0.55   0.48  6.6 1.05
+## intentions1_4  517  0.59  0.63  0.58   0.48  6.2 1.31
+## intentions1_5  517  0.43  0.41  0.31   0.25  6.0 1.81
+## intentions1_6  517  0.70  0.76  0.75   0.64  6.4 0.99
+## intentions1_7r 517  0.67  0.59  0.55   0.52  5.3 1.91
+## intentions1_8r 517  0.68  0.60  0.57   0.53  5.6 1.90
+## intentions1_9r 517  0.74  0.69  0.67   0.63  6.1 1.79
+## intentions1_10 517  0.69  0.74  0.72   0.62  6.5 1.03
 ## 
 ## Non missing response frequency for each item
 ##                   1    2    3    4    5    6    7 miss
-## intentions1_1  0.00 0.01 0.01 0.03 0.07 0.20 0.68    0
-## intentions1_2  0.02 0.02 0.02 0.04 0.08 0.23 0.59    0
-## intentions1_3  0.01 0.01 0.02 0.01 0.04 0.08 0.83    0
-## intentions1_4  0.01 0.02 0.01 0.06 0.09 0.19 0.62    0
-## intentions1_5  0.07 0.03 0.02 0.04 0.07 0.12 0.66    0
-## intentions1_6  0.01 0.00 0.01 0.02 0.06 0.23 0.67    0
-## intentions1_7r 0.05 0.09 0.09 0.09 0.09 0.21 0.38    0
-## intentions1_8r 0.04 0.06 0.06 0.05 0.06 0.23 0.51    0
-## intentions1_9r 0.03 0.06 0.04 0.02 0.02 0.09 0.74    0
-## intentions1_10 0.01 0.01 0.01 0.02 0.06 0.14 0.75    0</code></pre>
+## intentions1_1  0.01 0.01 0.01 0.03 0.06 0.20 0.68    0
+## intentions1_2  0.02 0.01 0.02 0.03 0.09 0.24 0.58    0
+## intentions1_3  0.01 0.01 0.02 0.02 0.05 0.07 0.83    0
+## intentions1_4  0.02 0.02 0.01 0.07 0.08 0.18 0.62    0
+## intentions1_5  0.08 0.02 0.01 0.04 0.07 0.15 0.63    0
+## intentions1_6  0.01 0.00 0.02 0.02 0.07 0.23 0.65    0
+## intentions1_7r 0.04 0.09 0.08 0.10 0.09 0.20 0.39    0
+## intentions1_8r 0.05 0.07 0.06 0.05 0.05 0.21 0.51    0
+## intentions1_9r 0.04 0.06 0.05 0.02 0.01 0.09 0.74    0
+## intentions1_10 0.01 0.01 0.01 0.01 0.07 0.14 0.74    0</code></pre>
 </div>
 <div id="define-function-to-make-results-table" class="section level1">
 <h1>define function to make results table</h1>

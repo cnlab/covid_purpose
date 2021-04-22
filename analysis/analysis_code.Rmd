@@ -1,6 +1,6 @@
 ---
 title: "Manuscript Analyses"
-author: "Yoona Kang"
+author: "Yoona Kang & Dani Cosme"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -24,14 +24,14 @@ options(scipen=999)
 
 # load packages
 ```{r}
-library("lme4")
-library("lmerTest")
-library("ggplot2")
-library("Rcpp")
-library("lm.beta")
-library("psych")
-library('knitr')
-library('tidyverse')
+library(lme4)
+library(lmerTest)
+library(ggplot2)
+library(Rcpp)
+library(lm.beta)
+library(psych)
+library(knitr)
+library(tidyverse)
 library(interactions)
 library(dplyr)
 library(tidyr)
@@ -40,7 +40,7 @@ library(corrplot)
 
 # load data
 ```{r}
-df <- read.csv('covid19_study1_clean_wide.csv', stringsAsFactors = FALSE)
+df <- read.csv('../data/data_clean_wide.csv', stringsAsFactors = FALSE)
 ```
 
 # clean data
