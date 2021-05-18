@@ -37,9 +37,6 @@ if (!require(DT)) {
 
 # load and tidy data
 
-* The survey key is located [here](https://upenn.box.com/s/ftm9deaq4tqflzjxwhmboqy9q6c9dxpu)
-* The message stimuli can be found [here](https://upenn.box.com/s/h3vhnqbdmp383rvahnaalas20cqz7u5g)
-
 Note that the MIDs have been scrambled in the raw qualtrics data to deidentify them. Scrambling was conducted using the following code:
 
 ```
