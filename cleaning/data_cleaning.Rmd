@@ -1,10 +1,10 @@
 ---
-title: "COVID19 Study1 Data Cleaning"
-author: "Dani Cosme"
+title: "Manuscript Analyses"
+author: "Yoona Kang"
 date: "`r Sys.Date()`"
 output:
   html_document:
-    code_folding: hide
+    code_folding: show
     df_print: paged
     highlight: tango
     theme: united
@@ -24,512 +24,824 @@ options(scipen=999)
 
 # load packages
 ```{r}
-if (!require(tidyverse)) {
-  install.packages('tidyverse')
+library("lme4")
+library("lmerTest")
+library("ggplot2")
+library("Rcpp")
+library("lm.beta")
+library("psych")
+library('knitr')
+library('tidyverse')
+#library(ggsci)
+#library(jtools)
+library(interactions)
+#library(gridExtra)
+library(dplyr)
+library(tidyr)
+library(corrplot)
+```
+
+# load data
+```{r}
+df <- read.csv('covid19_study1_clean_wide.csv', stringsAsFactors = FALSE)
+```
+
+# clean data
+```{r}
+#calculate purpose average scores
+
+df$purpose_2r <- ifelse(df$purpose_2 == 6,1,
+                           ifelse(df$purpose_2 == 5,2,
+                                  ifelse(df$purpose_2 == 4,3,
+                                         ifelse(df$purpose_2 == 3,4,
+                                                ifelse(df$purpose_2 == 2, 5,
+                                                       ifelse(df$purpose_2 == 1,6,
+                                                              NA))))))
+
+
+df$purpose_4r <- ifelse(df$purpose_4 == 6,1,
+                        ifelse(df$purpose_4 == 5,2,
+                               ifelse(df$purpose_4 == 4,3,
+                                      ifelse(df$purpose_4 == 3,4,
+                                             ifelse(df$purpose_4 == 2, 5,
+                                                    ifelse(df$purpose_4 == 1,6,
+                                                           NA))))))
+
+df$purpose_5r <- ifelse(df$purpose_5 == 6,1,
+                        ifelse(df$purpose_5 == 5,2,
+                               ifelse(df$purpose_5 == 4,3,
+                                      ifelse(df$purpose_5 == 3,4,
+                                             ifelse(df$purpose_5 == 2, 5,
+                                                    ifelse(df$purpose_5 == 1,6,
+                                                           NA))))))
+df$purpose_6r <- ifelse(df$purpose_6 == 6,1,
+                        ifelse(df$purpose_6 == 5,2,
+                               ifelse(df$purpose_6 == 4,3,
+                                      ifelse(df$purpose_6 == 3,4,
+                                             ifelse(df$purpose_6 == 2, 5,
+                                                    ifelse(df$purpose_6 == 1,6,
+                                                           NA))))))
+
+  
+
+df$purpose = rowMeans(df[,c("purpose_1",  "purpose_2r", "purpose_3" , "purpose_4r",
+                 "purpose_5r", "purpose_6r", "purpose_7")])
+
+
+
+#calculate intention average scores
+
+#all intention items (1-10)
+
+df$intentions1_7r <- ifelse(df$intentions1_7 == 7,1,
+                            ifelse(df$intentions1_7 == 6,2,
+                                   ifelse(df$intentions1_7 == 5,3,
+                                          ifelse(df$intentions1_7 == 4,4,
+                                                 ifelse(df$intentions1_7 == 3, 5,
+                                                        ifelse(df$intentions1_7 == 2,6,
+                                                               ifelse(df$intentions1_7 == 1,7,
+                                                                      NA)))))))
+df$intentions1_8r <- ifelse(df$intentions1_8 == 7,1,
+                            ifelse(df$intentions1_8 == 6,2,
+                                   ifelse(df$intentions1_8 == 5,3,
+                                          ifelse(df$intentions1_8 == 4,4,
+                                                 ifelse(df$intentions1_8 == 3, 5,
+                                                        ifelse(df$intentions1_8 == 2,6,
+                                                               ifelse(df$intentions1_8 == 1,7,
+                                                                      NA)))))))
+df$intentions1_9r <- ifelse(df$intentions1_9 == 7,1,
+                            ifelse(df$intentions1_9 == 6,2,
+                                   ifelse(df$intentions1_9 == 5,3,
+                                          ifelse(df$intentions1_9 == 4,4,
+                                                 ifelse(df$intentions1_9 == 3, 5,
+                                                        ifelse(df$intentions1_9 == 2,6,
+                                                               ifelse(df$intentions1_9 == 1,7,
+                                                                      NA)))))))
+
+
+df$intentions = rowMeans(df[,c("intentions1_1" , "intentions1_2" , "intentions1_3" , "intentions1_4" , 
+                               "intentions1_5" , "intentions1_6" , "intentions1_7r" ,  "intentions1_8r" ,  
+                               "intentions1_9r" , "intentions1_10")])
+
+
+#intention, social distancing items only: 2, 4, 6, 10
+df$intentions_sd = rowMeans(df[,c("intentions1_2","intentions1_4", "intentions1_6", "intentions1_10")])
+
+#intention hand washing items: 1, 7r, 8r, 9r
+df$intentions_hand = rowMeans(df[,c("intentions1_1","intentions1_7r", "intentions1_8r", "intentions1_9r")])
+
+#intention staying home items: 3, 5
+df$intentions_home = rowMeans(df[,c("intentions1_3", "intentions1_5")])
+
+
+
+# norms
+
+## norms_close all (1-10)
+
+df$norms_close1_7r <- 100-df$norms_close1_7
+df$norms_close1_8r <- 100-df$norms_close1_8
+df$norms_close1_9r <- 100-df$norms_close1_9
+
+df$norms_close = rowMeans(df[,c("norms_close1_1", "norms_close1_2", "norms_close1_3", "norms_close1_4", 
+"norms_close1_5", "norms_close1_6", "norms_close1_7r", "norms_close1_8r",
+"norms_close1_9r", "norms_close1_10")])
+
+
+# norms_close social distancing only (2 4 6 10)
+df$norms_close_sd = rowMeans(df[,c("norms_close1_2", "norms_close1_4", "norms_close1_6", "norms_close1_10")])
+
+#norms_close hand washing items: 1, 7r, 8r, 9r
+df$norms_close_hand = rowMeans(df[,c("norms_close1_1","norms_close1_7r", "norms_close1_8r", "norms_close1_9r")])
+
+#norms_close staying home items: 3, 5
+df$norms_close_home = rowMeans(df[,c("norms_close1_3", "norms_close1_5")])
+
+
+
+#belief
+## belief_norms (1, 2, 3 (took out 4 in the purpose prereg))
+df$beliefs_norms_1r <- ifelse(df$beliefs_norms_1 == 7,1,
+                              ifelse(df$beliefs_norms_1 == 6,2,
+                                     ifelse(df$beliefs_norms_1 == 5,3,
+                                            ifelse(df$beliefs_norms_1 == 4,4,
+                                                   ifelse(df$beliefs_norms_1 == 3, 5,
+                                                          ifelse(df$beliefs_norms_1 == 2,6,
+                                                                 ifelse(df$beliefs_norms_1 == 1,7,
+                                                                        NA)))))))
+
+
+df$beliefs_norms = rowMeans(df[,c("beliefs_norms_1r","beliefs_norms_2","beliefs_norms_3")])
+df$beliefs_safe_self = rowMeans(df[,c("beliefs_safe_self_1","beliefs_safe_self_2", "beliefs_safe_self_3", 
+                                      "beliefs_safe_self_4", "beliefs_safe_self_5")])
+df$beliefs_safe_others = rowMeans(df[,c( "beliefs_safe_others_1","beliefs_safe_others_2", "beliefs_safe_others_3",
+                                       "beliefs_safe_others_4", "beliefs_safe_others_5", "beliefs_safe_others_6",
+                                       "beliefs_safe_others_7", "beliefs_safe_others_8")])
+
+#clean up the subjective SES scale
+df <- within(df, {
+  ses_subj <- ifelse(ses_subj_1 == "On", 1,
+                     ifelse(ses_subj_2 == "On", 2,
+                            ifelse(ses_subj_3 == "On", 3,
+                                   ifelse(ses_subj_4 == "On", 4, 
+                                          ifelse(ses_subj_5 == "On", 5,
+                                                 ifelse(ses_subj_6 == "On", 6, 
+                                                        ifelse(ses_subj_7 == "On", 7,
+                                                               ifelse(ses_subj_8 == "On", 8, 
+                                                                      ifelse(ses_subj_9 == "On", 9,
+                                                                             ifelse(ses_subj_10 == "On", 10, NA))))))))))
+})
+
+
+
+#calculate the relevant data subset
+df_raw <- df
+df =subset(df,lonely_current!='NA')
+df =subset(df,purpose!='NA')
+df =subset(df,intentions !='NA')
+
+
+#winsorize the following variables with outliers +/- 3SD from mean
+table(scale(df$purpose))
+table(scale(df$intentions))
+table(scale(df$intentions_sd))
+table(scale(df$intentions_hand)) 
+table(scale(df$intentions_home)) 
+table(scale(df$norms_close)) 
+table(scale(df$norms_close_sd)) 
+table(scale(df$norms_close_home)) 
+table(scale(df$beliefs_safe_self)) 
+table(scale(df$beliefs_safe_others)) 
+table(scale(df$house_size_curre))
+table(scale(df$age))
+table(scale(df$norms_close_hand )) #no outlier 
+table(scale(df$beliefs_norms )) #no outlier 
+table(scale(df$lonely_current)) #no outliers
+table(scale(df$lonely_prior))#no outliers
+table(scale(df$ses_subj))#no outliers
+
+
+#replace outliers with +/- 3SD from mean
+df=df %>%
+mutate(mean = mean(purpose, na.rm = TRUE),
+       sd3 = 3*sd(purpose, na.rm = TRUE),
+       purpose = ifelse(purpose > mean + sd3, mean + sd3, purpose), # above --> mean - 3 * SD
+       purpose = ifelse(purpose < mean - sd3, mean - sd3, purpose))%>% # below --> mean - 3 * SD
+
+mutate(mean = mean(intentions, na.rm = TRUE),
+       sd3 = 3*sd(intentions, na.rm = TRUE),
+       intentions = ifelse(intentions > mean + sd3, mean + sd3, intentions), # above --> mean - 3 * SD
+       intentions = ifelse(intentions < mean - sd3, mean - sd3, intentions))%>% # below --> mean - 3 * SD
+  mutate(mean = mean(intentions_sd, na.rm = TRUE),
+         sd3 = 3*sd(intentions_sd, na.rm = TRUE),
+         intentions_sd = ifelse(intentions_sd > mean + sd3, mean + sd3, intentions_sd), # above --> mean - 3 * SD
+         intentions_sd = ifelse(intentions_sd < mean - sd3, mean - sd3, intentions_sd))%>% # below --> mean - 3 * SD
+  mutate(mean = mean(intentions_hand, na.rm = TRUE),
+         sd3 = 3*sd(intentions_hand, na.rm = TRUE),
+         intentions_hand = ifelse(intentions_hand > mean + sd3, mean + sd3, intentions_hand), # above --> mean - 3 * SD
+         intentions_hand = ifelse(intentions_hand < mean - sd3, mean - sd3, intentions_hand))%>%
+  mutate(mean = mean(intentions_home, na.rm = TRUE),
+         sd3 = 3*sd(intentions_home, na.rm = TRUE),
+         intentions_home = ifelse(intentions_home > mean + sd3, mean + sd3, intentions_home), # above --> mean - 3 * SD
+         intentions_home = ifelse(intentions_home < mean - sd3, mean - sd3, intentions_home))%>%
+  mutate(mean = mean(norms_close, na.rm = TRUE),
+         sd3 = 3*sd(norms_close, na.rm = TRUE),
+         norms_close = ifelse(norms_close > mean + sd3, mean + sd3, norms_close), # above --> mean - 3 * SD
+         norms_close = ifelse(norms_close < mean - sd3, mean - sd3, norms_close))%>%
+  mutate(mean = mean(norms_close_sd, na.rm = TRUE),
+         sd3 = 3*sd(norms_close_sd, na.rm = TRUE),
+         norms_close_sd = ifelse(norms_close_sd > mean + sd3, mean + sd3, norms_close_sd), # above --> mean - 3 * SD
+         norms_close_sd = ifelse(norms_close_sd < mean - sd3, mean - sd3, norms_close_sd))%>%
+  mutate(mean = mean(norms_close_home, na.rm = TRUE),
+         sd3 = 3*sd(norms_close_home, na.rm = TRUE),
+         norms_close_home = ifelse(norms_close_home > mean + sd3, mean + sd3, norms_close_home), # above --> mean - 3 * SD
+         norms_close_home = ifelse(norms_close_home < mean - sd3, mean - sd3, norms_close_home))%>%
+  mutate(mean = mean(beliefs_safe_self, na.rm = TRUE),
+         sd3 = 3*sd(beliefs_safe_self, na.rm = TRUE),
+         beliefs_safe_self = ifelse(beliefs_safe_self > mean + sd3, mean + sd3, beliefs_safe_self), # above --> mean - 3 * SD
+         beliefs_safe_self = ifelse(beliefs_safe_self < mean - sd3, mean - sd3, beliefs_safe_self))%>%
+  mutate(mean = mean(beliefs_safe_others, na.rm = TRUE),
+         sd3 = 3*sd(beliefs_safe_others, na.rm = TRUE),
+         beliefs_safe_others = ifelse(beliefs_safe_others > mean + sd3, mean + sd3, beliefs_safe_others), # above --> mean - 3 * SD
+         beliefs_safe_others = ifelse(beliefs_safe_others < mean - sd3, mean - sd3, beliefs_safe_others))%>%
+  mutate(mean = mean(house_size_curre, na.rm = TRUE),
+         sd3 = 3*sd(house_size_curre, na.rm = TRUE),
+         house_size_curre = ifelse(house_size_curre > mean + sd3, mean + sd3, house_size_curre), # above --> mean - 3 * SD
+         house_size_curre = ifelse(house_size_curre < mean - sd3, mean - sd3, house_size_curre))%>%
+  mutate(mean = mean(age, na.rm = TRUE),
+         sd3 = 3*sd(age, na.rm = TRUE),
+         age = ifelse(age > mean + sd3, mean + sd3, age), # above --> mean - 3 * SD
+         age = ifelse(age < mean - sd3, mean - sd3, age))
+```
+
+# demographics
+```{r}
+summary(df$age)
+sd(df$age)
+table (df$gender)
+table (df$race)
+```
+
+```{r}
+#The current and pre-pandemic levels of loneliness were highly correlated
+cor.test(df$lonely_current, df$lonely_prior)
+
+# crombach's alpha
+df_purpose <- df_raw[ , c("purpose_1", "purpose_2r", "purpose_3", "purpose_4r", "purpose_5r", "purpose_6r", "purpose_7")]    
+alpha(df_purpose)
+
+df_intention <- df_raw[ , c("intentions1_1" , "intentions1_2" , "intentions1_3" , "intentions1_4" , 
+                               "intentions1_5" , "intentions1_6" , "intentions1_7r" ,  "intentions1_8r" ,  
+                               "intentions1_9r" , "intentions1_10")]    
+alpha(df_intention)
+
+```
+
+# define function to make results table
+```{r}
+make_table = function(model) {
+  require(broom)
+  require(knitr)
+  
+  print(data.frame(R2 = summary(model)$r.squared,
+             adjusted_R2 = summary(model)$adj.r.squared,
+             df = summary(model)$df[2]) %>%
+    knitr::kable(format = "pandoc", digits = 2))
+    
+  print(model %>%
+    broom::tidy(conf.int = TRUE) %>%
+    mutate(p.value = ifelse(p.value < .001, "< .001", gsub("0.(.*)", ".\\1", sprintf("%.3f", p.value))),
+           `95% CI` = sprintf("%.2f, %.2f", conf.low, conf.high),
+           term = gsub("as.factor", "", term)) %>%
+    select(-contains("conf")) %>%
+    rename("b" = estimate,
+           "SE" = std.error,
+           "t" = statistic,
+           "p" = p.value) %>%
+    select(term, b, `95% CI`, everything()) %>%
+    knitr::kable(format = "pandoc", digits = 2))
 }
-if (!require(knitr)) {
-  install.packages('knitr')
-}
-if (!require(DT)) {
-  install.packages('DT')
-}
 ```
 
-# load and tidy data
+# Purpose in life Predicting Loneliness and COVID-Preventive Intentions
+```{r}
+#H1a. Higher self-reported purpose in life will be associated with less perceived loneliness.
 
-* The survey key is located [here](https://upenn.box.com/s/ftm9deaq4tqflzjxwhmboqy9q6c9dxpu)
-* The message stimuli can be found [here](https://upenn.box.com/s/h3vhnqbdmp383rvahnaalas20cqz7u5g)
+test <- lm(lonely_current ~ purpose+as.factor(condition), data=df)
+##summ(test, digits = 3, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
 
-Note that the MIDs have been scrambled in the raw qualtrics data to deidentify them. Scrambling was conducted using the following code:
+test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df)
+##summ(test, digits = 3, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
+
+#H2. Higher self-reported purpose in life will be associated with more positive responses to COVID-19 related measures, including intentions, norms, and beliefs.
+test <- lm(intentions~purpose+as.factor(condition), df)
+##summ(test, digits = 3, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
 
 ```
-read.csv("covid19_study1_qualtrics.csv", stringsAsFactors = FALSE) %>% 
-  mutate(MID = stringi::stri_rand_shuffle(MID)) %>%
-  write.csv("covid19_study1_qualtrics.csv", row.names = FALSE)
+
+# Loneliness Predicting COVID Preventive Intentions
+```{r}
+#Exploratory1. We will test whether higher perceived loneliness will be associated with more negative responses to COVID-19 related measures, including intentions, norms, and beliefs
+
+test <- lm(intentions~lonely_current+as.factor(condition), df)
+##summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <- lm(intentions~lonely_prior+as.factor(condition), df)
+##summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 ```
 
-This code tidies the raw data and outputs a dataframe in the long format with the following columns:
-
-`study` = study name  
-`condition` = experimental group (no message control, message control, norm, autonomous, mocking)  
-`survey_name` = name of the survey or question category (e.g. intentions or SES)  
-`item` = individual survey item (or message rating) name  
-`value` = response or rating  
+# Purpose in Life Moderating the Relationship Between Age and Lonelines
 
 ```{r}
-# load state codes
-states = read.csv("state_codes.csv", stringsAsFactors = FALSE) %>%
-  mutate(state_code = as.character(state_code))
+#H1b. Age will be tested as a potential moderator for H1a, such that higher purpose is more strongly associated with less loneliness for older adults compared to younger adults
 
-# load message info
-message_info = read.csv("../../../covid19-message-framing-private/covid19_study1/message_info.csv", stringsAsFactors = FALSE) %>%
-  rename("message_text" = text) %>%
-  mutate(condition = gsub(" ", "", condition),
-         condition = tolower(condition),
-         condition = ifelse(condition == "control", "message control",
-                     ifelse(condition == "descriptivenorm", "norm",
-                     ifelse(condition == "humor(mocking)", "mocking", condition)))) %>%
-  mutate(message = sprintf("msg_%02d", as.numeric(image_number))) %>%
-  filter(message %in% c("msg_06", "msg_07", "msg_08", "msg_09", "msg_10", 
-                        "msg_12", "msg_15", "msg_17", "msg_18", "msg_20", 
-                        "msg_23", "msg_24", "msg_25", "msg_31", "msg_32")) %>%
-  mutate(behavior = "social_distancing") %>%
-  select(condition, message, message_text, behavior)
+test <- lm(lonely_current ~ age+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 
-# load and tidy survey
-surveys = read.csv("../../../covid19-message-framing-private/covid19_study1/covid19_study1_qualtrics.csv", stringsAsFactors = FALSE) %>%
-  slice(3:n()) %>%
-  filter(!DistributionChannel == "preview") %>% # remove preview responses
-  filter(!mturk_code == "") %>% # remove participants who failed screener
-  filter(!MID == "" | StartDate == "") %>% # remove test responses
-  rename("dehumanization_1" = dehumanization_10, # rename slider variables and state
-         "dehumanization_2" = dehumanization_11,
-         "dehumanization_3" = dehumanization_12,
-         "dehumanization_4" = dehumanization_13,
-         "dehumanization_5" = dehumanization_14,
-         "dehumanization_6" = dehumanization_15,
-         "dehumanization_7" = dehumanization_16,
-         "dehumanization_8" = dehumanization_17,
-         "dehumanization_9" = dehumanization_18,
-         "dehumanization_10" = dehumanization_19,
-         "dehumanization_11" = dehumanization_20,
-         "state_code" = state,
-         "msg_time_pre" = pre_msg_time,
-         "msg_time_post"= post_msg_time) %>%
-  left_join(., states, by = "state_code") %>% # replace state code with name
-  select(-state_code) %>%
-  mutate(SID = sprintf("s%04d", row_number())) %>% # create unique SID
-  gather(var, val, starts_with("X")) %>%
-  extract(var, c("message", "condition", "question"), "X([0-9]+)_(.*)_(msg.*)", remove = FALSE) %>% #rename conditions
-  mutate(group = ifelse(group == "norms", "norm", group),
-         condition = ifelse(condition == "a", "autonomous",
-                     ifelse(condition == "n", "norm",
-                     ifelse(condition == "c", "control", 
-                     ifelse(condition == "m", "mocking", condition)))),
-         message = recode(message, "1" = "06", "4" = "07", "5" = "08", # recode messages to match those in message_info.csv
-                                   "6" = "09", "7" = "10", "8" = "12",
-                                   "9" = "15", "10" = "17", "11" = "18",
-                                   "12" = "20", "13" = "23", "14" = "24",
-                                   "15" = "25", "16" = "31", "17" = "32"),
-         var = sprintf("%s_%s_%s", condition, question, message)) %>%
-  select(-c(message, condition, question, MID), -contains(".stims")) %>%
-  spread(var, val) %>%
-  gather(item, value, -c(SID, group)) %>%
-  mutate(value = ifelse(value == "", NA, value)) %>%
-  extract(item, "survey_name", "(.*)_[0-9]+", remove = FALSE) %>%
-  mutate(survey_name = ifelse(is.na(survey_name), item, survey_name)) %>%
-  rename("condition" = group)
+test <- lm(lonely_prior ~ age+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 
-# get completed messages and remove condition info
-messages = surveys %>%
-  filter(grepl("msg", item)) %>%
-  filter(!is.na(value)) %>%
-  mutate(item = gsub("(.*)_msg", "msg", item),
-         survey_name = gsub("(.*)_msg", "msg", survey_name))
+test <- lm(lonely_current~ age*purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 
-# replace messages 
-surveys_merged = surveys %>%
-  filter(!grepl("msg", item)) %>% # remove message ratings
-  bind_rows(messages) %>% # replace message ratings with cleaned message ratings
-  mutate(study = "study1") %>%
-  select(study, condition, SID, survey_name, item, value)
+#simple slopes analysis
+print(purpose_low<- round((mean(df$purpose) - sd(df$purpose)),1))
+print(purpose_mid<- round((mean(df$purpose)),1))
+print(purpose_high <- round((mean(df$purpose) + sd(df$purpose)),1))
 
-# spread to wide format
-surveys_merged_wide = surveys_merged %>%
-  select(-survey_name) %>%
-  spread(item, value)
+
+df$lonely_cen = df$lonely_current - mean(df$lonely_current,na.rm=T)
+df$age_cen = df$age - mean(df$age,na.rm=T)
+df$purpose_cen = df$purpose - mean(df$purpose,na.rm=T)
+df$intentions_cen = df$intentions - mean(df$intentions,na.rm=T)
+
+df$purpose_low <- df$purpose_cen + sd(df$purpose_cen, na.rm=T)
+df$purpose_high <- df$purpose_cen - sd(df$purpose_cen, na.rm=T)
+
+#At higher and mean levels of purpose in life, older age was associated with less loneliness, at one standard deviation above the mean and mean levels of purpose in life
+test <-lm(lonely_cen~ purpose_high *age_cen+ as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(lonely_cen~ purpose_cen *age_cen+ as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(lonely_cen~ purpose_low *age_cen+ as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+#A robustness check by dividing the sample at the median purpose score 
+purpose_high <- subset(df, purpose >= median(df$purpose))
+purpose_low <- subset(df, purpose < median(df$purpose))
+
+test <-lm(lonely_cen~ age_cen+ as.factor(condition), purpose_high)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(lonely_cen~ age_cen+ as.factor(condition), purpose_low)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 ```
 
-Number of participants before exclusions = `r nrow(surveys_merged_wide)`
-
-## quality checks
-### failed checks
-* Many more people failed the flattening the curve question than the COVID-19 or social distancing questions
-* Because the survey emphasizes COVID-19 and social distancing, let's just use those items to determine failed checks
-* The correct answer for the English check is the school bus, but let's be lenient and accept the truck as well
-
+# Exploratory Analyses: The Relationship between Loneliness and COVID Preventive Intentions at Different Levels of Purpose in Life 
 ```{r}
-# identify failed attention checks
-failed_attn = surveys %>%
-  filter(item == "attention_2" & !grepl("How do you feel about social media?", value)) %>%
-  select(SID, value) %>%
-  unique()
+test <-lm(intentions_cen~ purpose_low *lonely_cen+ as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 
-# identify failed knowledge checks
-failed_covid_qs = surveys %>%
-  select(-survey_name) %>%
-  filter(grepl("knowledge|^code", item)) %>%
-  spread(item, value) %>%
-  gather(item, value, starts_with("knowledge")) %>%
-  mutate(failed = ifelse(item == "knowledge_covid" & SID %in% c("s0873", "s0935", "s0047", "s0199", "s0626", "s0842", "s0417", "s0768", "s0821"), 1,
-                  # ifelse(item == "knowledge_flatten" & SID %in% c("s0002", "s0064", "s0170", "s0047", "s0045", "s0199", "s0071", "s0094", "s0221",
-                  #                                                "s0297", "s0354", "s0400", "s0430", "s0476", "s0490", "s0507", "s0513", "s0522",
-                  #                                                "s0575", "s0621", "s0626", "s0657", "s0666", "s0675", "s0685", "s0695", "s0705",
-                  #                                                "s0708", "s0723", "s0732", "s0768", "s0769", "s0790", "s0794", "s0812", "s0821",
-                  #                                                "s0825", "s0842", "s0844", "s0873", "s0875", "s0889", "s0913", "s0935", "s0939",
-                  #                                                "s0946", "s0958", "s1006", "s1014", "s1020", "s1038", "s1091", "s1094", "s1101"), 1,
-                  ifelse(item == "knowledge_social" & SID %in% c("s0002", "s0047", "s0199", "s0221", "s0297", "s0430", "s0476", "s0575", "s0626", 
-                                                                  "s0666", "s0685", "s0754", "s0768", "s0794", "s0808", "s0821", "s0842", "s0844", 
-                                                                  "s0851", "s0873", "s0889", "s0935", "s1020", "s1020", "s1101"), 1, 0))) %>%
-  select(SID, item, failed) %>%
-  unique() %>%
-  group_by(SID) %>%
-  summarize(n_knowledge_failed = sum(failed))
+test <-lm(intentions_cen~ purpose_cen *lonely_cen+ as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 
-failed_covid_subs = failed_covid_qs %>%
-  filter(n_knowledge_failed > 0)
+test <-lm(intentions_cen~ purpose_high *lonely_cen+ as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 
-# identify failed English checks
-failed_english = surveys %>%
-  filter(item == "english") %>%
-  filter(!grepl("bus|truck", tolower(value)) | SID %in% c("s0066", "s0161", "s0221", "s0564", "s0612")) %>% #these participants copied the sentence
-  select(SID, value) %>%
-  unique()
+test <-lm(intentions ~ lonely_cen+ as.factor(condition), purpose_low)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 
-# print number of failed checks
-failed = surveys %>% 
-  select(SID) %>% 
-  unique() %>% 
-  mutate(`failed attention` = ifelse(SID %in% failed_attn$SID, 1, 0), 
-         `failed english` = ifelse(SID %in% failed_english$SID, 1, 0), 
-         `failed covid qs` = ifelse(SID %in% failed_covid_subs$SID, 1, 0),
-         `failed english & attention` = ifelse(`failed attention` == 1 & `failed english` == 1, 1, 0),
-         `failed english & covid qs` = ifelse(`failed english` == 1 & `failed covid qs` == 1, 1, 0),
-         `failed attention & covid qs` = ifelse(`failed attention` == 1 & `failed covid qs` == 1, 1, 0),
-         `failed attention & covid & english` = ifelse(`failed attention` == 1 & `failed covid qs` == 1 & `failed english` == 1, 1, 0),
-         `failed at least one check`  = ifelse(`failed attention` == 1 | `failed covid qs` == 1 | `failed english`, 1, 0))
-
-failed %>%
-  gather(check, val, contains("fail")) %>% 
-  filter(val == 1) %>% 
-  group_by(check) %>% 
-  summarize(n = n(),
-            `%` = round(n / nrow(failed_covid_qs) * 100, 1)) %>%
-  arrange(desc(n)) %>%
-  kable(format = "pandoc")
+test <-lm(intentions ~ lonely_cen+ as.factor(condition), purpose_high)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 ```
 
-### durations
-#### timer cumulative
+# TABLE & FIGURE {.tabset}
+## Figure 1. 
 ```{r}
-timers_pre = surveys %>%
-  select(-survey_name) %>%
-  filter(grepl("pre_|msg_.*_pre|Duration", item)) %>%
-  mutate(value = as.numeric(value),
-         item = gsub("randomizer1", "randomizer_dvs", item),
-         item = gsub("randomizer2", "randomizer_covs_all", item),
-         item = gsub("randomizer3", "randomizer_covs_bundles", item)) %>%
-  spread(item, value) %>%
-  group_by(SID) %>%
-  fill(Duration..in.seconds., .direction = "down") %>%
-  gather(item, value, contains("time")) %>%
-  group_by(item) %>%
-  mutate(median_value = median(value, na.rm = TRUE),
-         order = ifelse(item == "msg_time_pre", 1,
-                 ifelse(item == "pre_intentions_time", 2,
-                 ifelse(item == "pre_norms_time", 3,
-                 ifelse(item == "pre_beliefs_time", 4,
-                 ifelse(item == "pre_randomizer_dvs_time", 5,
-                 ifelse(item == "pre_randomizer_covs_all_time", 6,
-                 ifelse(item == "pre_randomizer_covs_bundles_time", 7,
-                 ifelse(item == "pre_demographics_time", 8,
-                 ifelse(item == "pre_employment_time", 9, 
-                 ifelse(item == "pre_SES_time", 10,
-                 ifelse(item == "pre_code_time", 11, 12)))))))))))) %>%
-  arrange(SID, order)
+# A.Simple slopes analysis showing the relationship between age and current loneliness at high (one standard deviation above the mean), mean, and low ( one standard deviation below the mean) levels of purpose in life. 
+test <- lm(lonely_current ~ age*purpose +as.factor(condition) , df)
+interact_plot(test, pred = age, modx = purpose, interval = TRUE, 
+              int.type = "confidence", int.width = 0.95) 
 
-timers_pre %>%
-  mutate(duration = sprintf("%s (%s mins)", SID, round(as.numeric(Duration..in.seconds.) / 60, 0))) %>%
-  ggplot(aes(reorder(item, order), value / 60)) +
-  geom_line(aes(group =  duration, color = duration), size = .5, alpha = .1) +
-  geom_line(aes(group =  duration, y = median_value / 60), color = "black") +
-  scale_y_continuous(breaks = seq(0, 120, 10)) +
-  coord_cartesian(ylim = c(0, 120)) +
-  labs(y = "durations (mins)", x = "") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),
-        legend.position = "none")
+#B. Simple slopes analysis showing the relationship between purpose in life and current loneliness across age, at one standard deviation below the mean (26.4 years), mean (37.7 years), one standard deviation above the mean (49 years), and two standard deviations above the mean (60.3 years) ages.
+interact_plot(test, pred = purpose, modx = age, interval = TRUE, 
+              int.type = "confidence", int.width = 0.95, modx.values = c(26.4, 37.7, 49, 60.3)) 
 ```
 
-#### overall durations
-```{r, fig.width = 12, fig.height=4}
-durations = surveys %>%
-  filter(item == "Duration..in.seconds.") %>%
-  mutate(duration_mins = as.numeric(value) / 60,
-         less_than_10_mins = ifelse(duration_mins < 10, 1, 0))
-
-# responses excluding s0962 (1473 mins)
-dur_plot_data = durations %>%
-  filter(!SID == "s0962") %>%
-  mutate(n = n(),
-         median = median(duration_mins, na.rm = TRUE),
-         sd3 = median + (3 * sd(duration_mins, na.rm = TRUE)),
-         slow = ifelse(duration_mins > (median + sd3), 1, 0))
-
-dur_plot_data %>%
-  ggplot(aes(duration_mins)) +
-  geom_histogram(alpha = .5) +
-  geom_freqpoly() +
-  geom_vline(aes(xintercept = median)) +
-  geom_vline(aes(xintercept = sd3), linetype = "dotted") +
-  annotate("text", label = sprintf("Median = %s", round(unique(dur_plot_data$median), 1)), x = unique(dur_plot_data$median) + 10, y = 175) + 
-  annotate("text", label = sprintf("3 SD = %s", round(unique(dur_plot_data$sd3), 1)), x = unique(dur_plot_data$sd3) + 10, y = 175) + 
-  labs(x = "duration (minutes)") +
-  theme_minimal()
-```
-
-#### print survey data for participants with durations < 10 mins
+## Table 1
 ```{r}
-fast_subs = durations %>%
-  filter(less_than_10_mins == 1)
 
-surveys_merged_wide %>% 
-  filter(SID %in% fast_subs$SID) %>%
-  left_join(., select(durations, SID, duration_mins)) %>%
-  select(SID, duration_mins, everything()) %>%
-  select(-study, -condition) %>%
-  mutate(duration_mins = round(duration_mins, 1)) %>%
-  arrange(duration_mins) %>%
-  DT::datatable(rownames = FALSE, extensions = 'FixedColumns', options = list(scrollX = TRUE,
-                                                                              scrollY = TRUE,
-                                                                              fixedColumns = list(leftColumns = 2)))
+#visualize correlation matrix 
+h3=df %>%
+  dplyr::select("purpose","lonely_current","lonely_prior","intentions", "age", "gender", "ses_subj", "house_size_curre")
+M <- Hmisc::rcorr(as.matrix(h3))
+corrplot(M$r, p.mat = M$P, insig = "label_sig",
+         sig.level = c(.001, .05), pch.cex=0.9, pch.col = "white",
+         method="color", type="lower")
+
+#table 1. correlation matrix stats
+cor.test(df$purpose, df$lonely_current)
+cor.test(df$purpose, df$lonely_prior)
+cor.test(df$purpose, df$intentions)
+cor.test(df$purpose, df$age)
+cor.test(df$purpose, df$gender)
+cor.test(df$purpose, df$ses_subj)
+cor.test(df$purpose, df$house_size_curre)
+
+cor.test(df$lonely_current, df$lonely_prior)
+cor.test(df$lonely_current, df$intentions)
+cor.test(df$lonely_current, df$age)
+cor.test(df$lonely_current, df$gender)
+cor.test(df$lonely_current, df$ses_subj)
+cor.test(df$lonely_current, df$house_size_curre)
+
+cor.test(df$lonely_prior, df$intentions)
+cor.test(df$lonely_prior, df$age)
+cor.test(df$lonely_prior, df$gender)
+cor.test(df$lonely_prior, df$ses_subj)
+cor.test(df$lonely_prior, df$house_size_curre)
+
+cor.test(df$intentions, df$age)
+cor.test(df$intentions, df$gender)
+cor.test(df$intentions, df$ses_subj)
+cor.test(df$intentions, df$house_size_curre)
+
+cor.test(df$age, df$gender)
+cor.test(df$age, df$ses_subj)
+cor.test(df$age, df$house_size_curre)
+
+cor.test(df$gender, df$ses_subj)
+cor.test(df$gender, df$house_size_curre)
+
+cor.test(df$ses_subj, df$house_size_curre)
 ```
 
-### invariance
-Goal is to identify participants who are responding the same way across all items within a survey
-
-* Calculate the SD for each surevy for each individual
-* Single item scales are not included
-* If SD = 0, code as invariant and calculate the percentage of invariant surveys for each participant
-
-```{r, fig.width = 8}
-invariance = surveys %>%
-  select(SID, survey_name, value) %>%
-  group_by(SID, survey_name) %>%
-  summarize(sd_survey = sd(as.numeric(value), na.rm = TRUE)) %>%
-  filter(!is.na(sd_survey)) %>%
-  group_by(SID) %>%
-  mutate(completed_variance = ifelse(!(is.na(sd_survey) | is.nan(sd_survey)), 1, 0),
-         n_survey = sum(completed_variance, na.rm = TRUE),
-         invariant = ifelse(sd_survey == 0, 1, 0),
-         sum_invariant = sum(invariant, na.rm = TRUE),
-         percent_surveys_invariant = (sum_invariant / n_survey ) * 100) %>%
-  select(SID, survey_name, sd_survey, percent_surveys_invariant) %>%
-  ungroup() %>%
-  select(SID, percent_surveys_invariant) %>%
-  unique() %>%
-  mutate(median = median(percent_surveys_invariant, na.rm = TRUE),
-         uppersd2 = median + (2 * sd(percent_surveys_invariant, na.rm = TRUE)),
-         uppersd3 = median + (3 * sd(percent_surveys_invariant, na.rm = TRUE)),
-         greater_than_2sd_invariance = ifelse(percent_surveys_invariant > uppersd2, 1, 0),
-         greater_than_3sd_invariance = ifelse(percent_surveys_invariant > uppersd3, 1, 0))
-
-invariance %>%
-  ggplot(aes(percent_surveys_invariant)) +
-    geom_histogram(alpha = .5) +
-    geom_freqpoly() +
-    geom_vline(aes(xintercept = median)) +
-    annotate("text", label = sprintf("Median = %s", round(unique(invariance$median), 1)), 
-             x = unique(invariance$median) + 5, y = 145, size = 2.5) + 
-    geom_vline(aes(xintercept = uppersd2), linetype = "dotted") +
-    annotate("text", label = sprintf("+2 SD = %s", round(unique(invariance$uppersd2), 1)), 
-             x = unique(invariance$uppersd2) + 5, y = 145, size = 2.5) + 
-    geom_vline(aes(xintercept = uppersd3), linetype = "dotted") +
-    annotate("text", label = sprintf("+3 SD = %s", round(unique(invariance$uppersd3), 1)), 
-             x = unique(invariance$uppersd3) + 5, y = 145, size = 2.5) + 
-    scale_x_continuous(breaks = seq(0, 100, 10)) +
-    scale_y_continuous(breaks = seq(0, 140, 20)) +
-    labs(x = "percent invariance across surveys") +
-    theme_minimal()
-```
-
-#### print survey data for participants with invariance > 2 SDs from the median
-* For a quick check of invariance, look at the agency scale: agency_2 = reverse-coded
-
+## Table 2
 ```{r}
-invariant_subs = invariance %>%
-  filter(greater_than_2sd_invariance == 1)
+#M1: Purpose in life → Loneliness (current)
+test <- lm(lonely_current ~ purpose+as.factor(condition), data=df) 
+#summ(test, digits = 2, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
 
-surveys_merged_wide %>% 
-  filter(SID %in% invariant_subs$SID) %>%
-  left_join(., select(invariance, SID, percent_surveys_invariant)) %>%
-  select(SID, percent_surveys_invariant, everything()) %>%
-  select(-study, -condition) %>%
-  mutate(percent_surveys_invariant = round(percent_surveys_invariant, 1)) %>%
-  arrange(desc(percent_surveys_invariant)) %>%
-  rename("% invariant" = percent_surveys_invariant) %>%
-  DT::datatable(rownames = FALSE, extensions = 'FixedColumns', options = list(scrollX = TRUE,
-                                                                              scrollY = TRUE,
-                                                                              fixedColumns = list(leftColumns = 2)))
+#M2: Purpose in life  → Loneliness (pre-pandemic)
+test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df) 
+#summ(test, digits = 2, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
+
+#M3: Purpose in life → COVID preventive intentions
+test <- lm(intentions~purpose+as.factor(condition), df) 
+#summ(test, digits = 2, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
+
+#M4: Loneliness (current) → COVID preventive intentions
+test <- lm(intentions~lonely_current+as.factor(condition), df)
+#summ(test, digits = 2, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
+
+#M5: Loneliness (pre-pandemic) → COVID preventive intentions
+test <- lm(intentions~lonely_prior+as.factor(condition), df)
+#summ(test, digits = 2, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
+
+#M6: Age → Loneliness (current)
+test <- lm(lonely_current ~ age+as.factor(condition), df) 
+#summ(test, digits = 2, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
+
+#M7: Age → Loneliness (pre-pandemic)
+test <- lm(lonely_prior ~ age+as.factor(condition), df) 
+#summ(test, digits = 2, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
+
+#M8: Purpose in life * Age → Loneliness
+test <- lm(lonely_current~ purpose*age+as.factor(condition), df)
+#summ(test, digits = 2, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
+
+#M9: Purpose in life * Loneliness → COVID preventive intentions
+test <- lm(intentions~ purpose*lonely_current+as.factor(condition), df)
+#summ(test, digits = 2, confint = TRUE)
+lm.beta(test)
+summary(test)
+make_table(test)
 ```
 
-#### print survey data for participants with invariance > 3 SDs from the median
-* For a quick check of invariance, look at the agency scale: agency_2 = reverse-coded
-
+# SUPPLEMENTALS {.tabset}
+## SI2
 ```{r}
-invariant_subs = invariance %>%
-  filter(greater_than_3sd_invariance == 1)
+#SI2. Associations between self-reported purpose in life and responses to COVID-19 related measures, including norms and beliefs. 
 
-surveys_merged_wide %>% 
-  filter(SID %in% invariant_subs$SID) %>%
-  left_join(., select(invariance, SID, percent_surveys_invariant)) %>%
-  select(SID, percent_surveys_invariant, everything()) %>%
-  select(-study, -condition) %>%
-  mutate(percent_surveys_invariant = round(percent_surveys_invariant, 1)) %>%
-  arrange(desc(percent_surveys_invariant)) %>%
-  rename("% invariant" = percent_surveys_invariant) %>%
-  DT::datatable(rownames = FALSE, extensions = 'FixedColumns', options = list(scrollX = TRUE,
-                                                                              fixedColumns = list(leftColumns = 1)))
+test <-lm(norms_close~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_norms~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_safe_others~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_safe_self~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
 ```
 
-### combine quality indicators
-Quality indicators:
-
-* Failed attention, English, and COVID-10 knowledge checks
-* Duration < 10 mins
-* Invariance > 3 SDs from the median
-
+## SI3
 ```{r}
-quality_check_all = durations %>%
-  select(SID, duration_mins, less_than_10_mins) %>%
-  left_join(., select(invariance, SID, percent_surveys_invariant, greater_than_3sd_invariance)) %>%
-  left_join(., select(failed, SID, `failed attention`, `failed english`, `failed covid qs`)) %>%
-  gather(var, val, contains("fail"), contains("than")) %>%
-  group_by(SID) %>%
-  mutate(n_indicators = sum(val),
-         duration_mins = round(duration_mins, 1),
-         percent_surveys_invariant = round(percent_surveys_invariant, 1)) %>%
-  spread(var, val) %>% 
-  filter(n_indicators > 0) %>%
-  rename("invariance >3 SD" = greater_than_3sd_invariance,
-         "duration < 10 mins" = less_than_10_mins) %>%
-  arrange(desc(n_indicators)) 
+#SI3. COVID-related outcomes specifically related to social distancing.
 
-quality_check_notime = durations %>%
-  select(SID, duration_mins) %>%
-  left_join(., select(invariance, SID, percent_surveys_invariant, greater_than_3sd_invariance)) %>%
-  left_join(., select(failed, SID, `failed attention`, `failed english`, `failed covid qs`)) %>%
-  gather(var, val, contains("fail"), contains("than")) %>%
-  group_by(SID) %>%
-  mutate(n_indicators = sum(val),
-         duration_mins = round(duration_mins, 1),
-         percent_surveys_invariant = round(percent_surveys_invariant, 1)) %>%
-  spread(var, val) %>% 
-  filter(n_indicators > 0) %>%
-  rename("invariance >3 SD" = greater_than_3sd_invariance) %>%
-  arrange(desc(n_indicators)) 
+test <- lm(intentions_sd~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 
-quality_check_failed = failed %>%
-  filter(`failed at least one check` == 1)
+test <- lm(intentions_hand~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 
-quality_check_all %>%
-  DT::datatable(filter = "top", rownames = FALSE, extensions = 'FixedColumns', 
-                options = list(scrollX = TRUE, fixedColumns = list(leftColumns = 2)))
+test <- lm(intentions_home~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+#Higher purpose also predicted higher perceptions about the normative approval of protective health behaviors including social distancing 
+test <- lm(norms_close_sd~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <- lm(norms_close_hand~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <- lm(norms_close_home~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+#Next, we tested whether the association between loneliness and COVID preventive intentions was driven by specific types of protective behavior.  
+#Higher loneliness predicted worse outcomes for each of the COVID-19 related subcategory behavior: higher loneliness was associated with
+test <- lm(intentions_sd~ lonely_current+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <- lm(intentions_hand~lonely_current+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <- lm(intentions_home~lonely_current+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+
+
+#Higher loneliness also predicted lower perceptions about the normative approval of protective health behaviors including social distancing 
+test <- lm(norms_close_sd~lonely_current+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <- lm(norms_close_hand~lonely_current+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <- lm(norms_close_home~lonely_current+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
 ```
 
-Excluding all these participants results in excluding `r round(nrow(quality_check_all) / nrow(durations) * 100, 1)`% of participants (n = `r nrow(quality_check_all)`)
-
-Removing the duration as an exclusion criteria results in excluding `r round(nrow(quality_check_notime) / nrow(durations) * 100, 1)`% of participants (n = `r nrow(quality_check_notime)`)
-
-Just excluding based on failed checks results in excluding `r round(nrow(quality_check_failed) / nrow(durations) * 100, 1)`% of participants (n = `r nrow(quality_check_failed)`)
-
-## purpose paper exclusions only
+## SI4
 ```{r}
-purpose = surveys_merged %>%
-  filter(grepl("lonely|purpose", item)) %>%
-  select(-survey_name) %>%
-  spread(item, value) %>%
-  filter(!(is.na(lonely_current) & is.na(purpose_1) & is.na(purpose_2)))
+#SI4. Potential covariates for analysis including loneliness. household size, ses/education, gender
 
-quality_check_notime %>%
-  filter(SID %in% purpose$SID) %>%
-  select(SID, n_indicators, `failed attention`, `failed covid qs`, `failed english`, `invariance >3 SD`) %>%
-  filter(n_indicators > 1)
+summary(lm(lonely_current ~ purpose+as.factor(condition)+house_size_curre+as.factor(gender)+ses_subj, data=df))#continued to be sig
+summary(lm(intentions~lonely_current+as.factor(condition)+house_size_curre+as.factor(gender)+ses_subj, df))#continued to be ns
+summary(lm(lonely_current~age+as.factor(condition)+house_size_curre+as.factor(gender)+ses_subj, df))#continued to be ns
 
-quality_check_notime %>%
-  filter(SID %in% purpose$SID) %>%
-  select(SID, n_indicators, `failed attention`, `failed covid qs`, `failed english`, `invariance >3 SD`) %>%
-  filter(n_indicators == 1) %>%
-  select(-n_indicators) %>%
-  gather(variable, value, -SID) %>%
-  filter(value == 1) %>%
-  group_by(variable) %>%
-  summarize(n = n())
+#other potential demographic covariates (age where appropriate)
+
+test <-lm(lonely_current ~ purpose, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+#Higher purpose was also associated with higher COVID preventive intentions in this subsample
+test <-lm(intentions~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(intentions_sd~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(norms_close~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(norms_close_sd~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_norms~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_safe_others~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_safe_self~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(intentions ~ lonely_current+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(intentions_sd ~ lonely_current+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
 ```
 
-
-## exclude participants
-
-Participants are excluded for:
-
-* Failing the attention check
-* Failing the English comprehension check (with lenient scoring to include either the truck or the school bus as correct)
-* Failing one or more of the COVID-19 questions (only COVID-19 and social distancing items)
-* Having invariance > 3 SDs from the median across people
-
+## SI5
 ```{r}
-# filter failed attn check and replace messages 
-surveys_clean = surveys_merged %>%
-  filter(!SID %in% quality_check_notime$SID) %>% # exclude participants
-  select(study, condition, SID, survey_name, item, value) %>%
-  filter(SID %in% purpose$SID) %>% # select only participants who received the purpose and loneliness items
-  filter(grepl("purpose|intentions1|norms_close1|beliefs_norms|beliefs_safe|ses_subj|lonely|house_size_curre|^age$|gender|race", item)) # subset relevant variables
+#SI5. Associations between perceived loneliness and responses to COVID-19 related measures.
+ 
+test <- lm(norms_close~lonely_current+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 
-# spread to wide format
-surveys_wide = surveys_clean %>%
-  select(-survey_name) %>%
-  spread(item, value)
+test <- lm(beliefs_norms~lonely_current+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <- lm(beliefs_safe_others~lonely_current+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <- lm(beliefs_safe_self~lonely_current+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+
 ```
 
-# summarize condition and survey ns
+## SI6
 ```{r}
-surveys_clean %>%
-  group_by(condition) %>%
-  select(SID, condition) %>%
-  unique() %>%
-  summarize(n = n())
+#SI6. Subsetting the sample. 
+df2 =subset (df,condition=='no message control')
+#In this subsample, higher purpose was associated with lower current levels of loneliness as in the main analysis
+test <-lm(lonely_current ~ purpose, df2)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 
-surveys_clean %>%
-  filter(!is.na(value)) %>%
-  group_by(condition, survey_name) %>%
-  select(SID, condition, survey_name) %>%
-  unique() %>%
-  summarize(n = n()) %>%
-  spread(condition, n) %>%
-  mutate(total = rowSums(.[,2:6], na.rm = TRUE)) %>%
-  DT::datatable(filter = "top", rownames = FALSE)
+#Higher purpose was also associated with higher COVID preventive intentions in this subsample
+test <-lm(intentions~purpose, df2)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(intentions_sd~purpose, df2)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(norms_close~purpose, df2)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(norms_close_sd~purpose, df2)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_norms~purpose, df2)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_safe_others~purpose, df2)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_safe_self~purpose, df2)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+#Consistent with main results, higher loneliness was associated with lower COVID preventive intentions 
+
+test <-lm(intentions ~ lonely_current, df2)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(intentions_sd ~ lonely_current, df2)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
 ```
 
-# check scale ranges
-## across all conditions
+## Figure SI
 ```{r}
-surveys_clean %>%
-  mutate(value = as.numeric(value)) %>% # all non-numeric values will be NA
-  filter(!is.na(value)) %>%
-  group_by(item) %>%
-  summarize(min = round(min(value), 2),
-            max = round(max(value), 2),
-            mean = round(mean(value), 2),
-            var = round(var(value), 2)) %>%
-  DT::datatable(filter = "top", rownames = FALSE)
-```
+#Figure SI.
+#Exploratory simple slopes at four levels of age across three levels of purpose in life.
+test <- lm(intentions ~ lonely_current*age*purpose +as.factor(condition) , df)
+interact_plot(test, pred = lonely_current, modx = age, mod2=purpose, interval = TRUE, 
+              int.type = "confidence", int.width = 0.95, modx.values = c(26.4, 37.7, 49, 60.3)) 
 
-## for each condition separately
-```{r}
-surveys_clean %>%
-  mutate(value = as.numeric(value)) %>% # all non-numeric values will be NA
-  filter(!is.na(value)) %>%
-  group_by(item, condition) %>%
-  summarize(min = round(min(value), 2),
-            max = round(max(value), 2),
-            mean = round(mean(value), 2),
-            var = round(var(value), 2)) %>%
-  DT::datatable(filter = "top", rownames = FALSE)
-```
 
-# write csvs
-```{r}
-write.csv(surveys_clean, "../data/data_clean_long.csv", row.names = FALSE)
-write.csv(surveys_wide, "../data/data_clean_wide.csv", row.names = FALSE)
+
+
+summary(lm(intentions_home ~ lonely_current +as.factor(condition) , df))
 ```
 
