@@ -1,6 +1,6 @@
 ---
 title: "Manuscript Analyses"
-author: "Yoona Kang & Dani Cosme"
+author: "Yoona Kang"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -24,15 +24,18 @@ options(scipen=999)
 
 # load packages
 ```{r}
-library(lme4)
-library(lmerTest)
-library(ggplot2)
-library(Rcpp)
-library(lm.beta)
-library(psych)
-library(knitr)
-library(tidyverse)
+library("lme4")
+library("lmerTest")
+library("ggplot2")
+library("Rcpp")
+library("lm.beta")
+library("psych")
+library('knitr')
+library('tidyverse')
+#library(ggsci)
+#library(jtools)
 library(interactions)
+#library(gridExtra)
 library(dplyr)
 library(tidyr)
 library(corrplot)
@@ -40,7 +43,7 @@ library(corrplot)
 
 # load data
 ```{r}
-df <- read.csv('../data/data_clean_wide.csv', stringsAsFactors = FALSE)
+df <- read.csv('covid19_study1_clean_wide.csv', stringsAsFactors = FALSE)
 ```
 
 # clean data
@@ -86,9 +89,7 @@ df$purpose = rowMeans(df[,c("purpose_1",  "purpose_2r", "purpose_3" , "purpose_4
 
 
 
-
 #calculate intention average scores
-
 
 #all intention items (1-10)
 
@@ -118,26 +119,19 @@ df$intentions1_9r <- ifelse(df$intentions1_9 == 7,1,
                                                                       NA)))))))
 
 
-
-
-
 df$intentions = rowMeans(df[,c("intentions1_1" , "intentions1_2" , "intentions1_3" , "intentions1_4" , 
                                "intentions1_5" , "intentions1_6" , "intentions1_7r" ,  "intentions1_8r" ,  
                                "intentions1_9r" , "intentions1_10")])
 
 
-#intention 1, social distancing items only: 2, 4, 6, 10
+#intention, social distancing items only: 2, 4, 6, 10
 df$intentions_sd = rowMeans(df[,c("intentions1_2","intentions1_4", "intentions1_6", "intentions1_10")])
 
-#intention non sd items: 1, 3, 5, 7r, 8r, 9r
-df$intentions_nsd = rowMeans(df[,c("intentions1_1","intentions1_3", "intentions1_5", "intentions1_7r", "intentions1_8r", "intentions1_9r")])
-
-#intention hand items: 1, 7r, 8r, 9r
+#intention hand washing items: 1, 7r, 8r, 9r
 df$intentions_hand = rowMeans(df[,c("intentions1_1","intentions1_7r", "intentions1_8r", "intentions1_9r")])
 
-#intention home items: 3, 5
+#intention staying home items: 3, 5
 df$intentions_home = rowMeans(df[,c("intentions1_3", "intentions1_5")])
-
 
 
 
@@ -157,16 +151,11 @@ df$norms_close = rowMeans(df[,c("norms_close1_1", "norms_close1_2", "norms_close
 # norms_close social distancing only (2 4 6 10)
 df$norms_close_sd = rowMeans(df[,c("norms_close1_2", "norms_close1_4", "norms_close1_6", "norms_close1_10")])
 
-#norms_close non sd items: 1, 3, 5, 7r, 8r, 9r
-df$norms_close_nsd = rowMeans(df[,c("norms_close1_1","norms_close1_3", "norms_close1_5", "norms_close1_7r", "norms_close1_8r", "norms_close1_9r")])
-
-
-#norms_close hand items: 1, 7r, 8r, 9r
+#norms_close hand washing items: 1, 7r, 8r, 9r
 df$norms_close_hand = rowMeans(df[,c("norms_close1_1","norms_close1_7r", "norms_close1_8r", "norms_close1_9r")])
 
-#norms_close home items: 3, 5
+#norms_close staying home items: 3, 5
 df$norms_close_home = rowMeans(df[,c("norms_close1_3", "norms_close1_5")])
-
 
 
 
@@ -205,24 +194,17 @@ df <- within(df, {
 
 
 
-#subset with available data
+#calculate the relevant data subset
 df_raw <- df
-df =subset (df,lonely_current!='NA')
-df =subset (df,purpose!='NA')
-df =subset (df,intentions !='NA')
-
-df$lonely_change = df$lonely_current - df$lonely_prior
-summary(df$lonely_change)
-
-df$lonely_ave = rowMeans(df[,c("lonely_current","lonely_prior")])
-summary(df$lonely_ave)
+df =subset(df,lonely_current!='NA')
+df =subset(df,purpose!='NA')
+df =subset(df,intentions !='NA')
 
 
-#winsorize the following variables
+#winsorize the following variables with outliers +/- 3SD from mean
 table(scale(df$purpose))
 table(scale(df$intentions))
 table(scale(df$intentions_sd))
-table(scale(df$intentions_nsd))
 table(scale(df$intentions_hand)) 
 table(scale(df$intentions_home)) 
 table(scale(df$norms_close)) 
@@ -230,10 +212,8 @@ table(scale(df$norms_close_sd))
 table(scale(df$norms_close_home)) 
 table(scale(df$beliefs_safe_self)) 
 table(scale(df$beliefs_safe_others)) 
-table(scale(df$lonely_change)) 
 table(scale(df$house_size_curre))
 table(scale(df$age))
-table(scale(df$norms_close_nsd)) #no outlier 
 table(scale(df$norms_close_hand )) #no outlier 
 table(scale(df$beliefs_norms )) #no outlier 
 table(scale(df$lonely_current)) #no outliers
@@ -241,7 +221,7 @@ table(scale(df$lonely_prior))#no outliers
 table(scale(df$ses_subj))#no outliers
 
 
-
+#replace outliers with +/- 3SD from mean
 df=df %>%
 mutate(mean = mean(purpose, na.rm = TRUE),
        sd3 = 3*sd(purpose, na.rm = TRUE),
@@ -256,10 +236,6 @@ mutate(mean = mean(intentions, na.rm = TRUE),
          sd3 = 3*sd(intentions_sd, na.rm = TRUE),
          intentions_sd = ifelse(intentions_sd > mean + sd3, mean + sd3, intentions_sd), # above --> mean - 3 * SD
          intentions_sd = ifelse(intentions_sd < mean - sd3, mean - sd3, intentions_sd))%>% # below --> mean - 3 * SD
-  mutate(mean = mean(intentions_nsd, na.rm = TRUE),
-         sd3 = 3*sd(intentions_nsd, na.rm = TRUE),
-         intentions_nsd = ifelse(intentions_nsd > mean + sd3, mean + sd3, intentions_nsd), # above --> mean - 3 * SD
-         intentions_nsd = ifelse(intentions_nsd < mean - sd3, mean - sd3, intentions_nsd))%>% # below --> mean - 3 * SD
   mutate(mean = mean(intentions_hand, na.rm = TRUE),
          sd3 = 3*sd(intentions_hand, na.rm = TRUE),
          intentions_hand = ifelse(intentions_hand > mean + sd3, mean + sd3, intentions_hand), # above --> mean - 3 * SD
@@ -288,10 +264,6 @@ mutate(mean = mean(intentions, na.rm = TRUE),
          sd3 = 3*sd(beliefs_safe_others, na.rm = TRUE),
          beliefs_safe_others = ifelse(beliefs_safe_others > mean + sd3, mean + sd3, beliefs_safe_others), # above --> mean - 3 * SD
          beliefs_safe_others = ifelse(beliefs_safe_others < mean - sd3, mean - sd3, beliefs_safe_others))%>%
-  mutate(mean = mean(lonely_change, na.rm = TRUE),
-         sd3 = 3*sd(lonely_change, na.rm = TRUE),
-         lonely_change = ifelse(lonely_change > mean + sd3, mean + sd3, lonely_change), # above --> mean - 3 * SD
-         lonely_change = ifelse(lonely_change < mean - sd3, mean - sd3, lonely_change))%>%
   mutate(mean = mean(house_size_curre, na.rm = TRUE),
          sd3 = 3*sd(house_size_curre, na.rm = TRUE),
          house_size_curre = ifelse(house_size_curre > mean + sd3, mean + sd3, house_size_curre), # above --> mean - 3 * SD
@@ -351,34 +323,25 @@ make_table = function(model) {
 }
 ```
 
-# Purpose in life Predicting Loneliness and COVID-Preventive Intentions {.tabset}
-## H1a
-Higher self-reported purpose in life will be associated with less perceived loneliness.
-
-As preregistered, across participants, higher self-reported purpose in life was associated with lower loneliness, for both the current
-
+# Purpose in life Predicting Loneliness and COVID-Preventive Intentions
 ```{r}
-test <- lm(lonely_current ~ purpose+as.factor(condition), data=df)#in the main text
+#H1a. Higher self-reported purpose in life will be associated with less perceived loneliness.
 
+test <- lm(lonely_current ~ purpose+as.factor(condition), data=df)
+##summ(test, digits = 3, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
 
-test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df)#in the main text
-
+test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df)
+##summ(test, digits = 3, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
-```
 
-
-## H2.
-
-Higher self-reported purpose in life will be associated with more positive responses to COVID-19 related measures, including intentions, norms, and beliefs.
-
-```{r}
-test <- lm(intentions~purpose+as.factor(condition), df) #in the main text
-
+#H2. Higher self-reported purpose in life will be associated with more positive responses to COVID-19 related measures, including intentions, norms, and beliefs.
+test <- lm(intentions~purpose+as.factor(condition), df)
+##summ(test, digits = 3, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
@@ -386,47 +349,37 @@ make_table(test)
 ```
 
 # Loneliness Predicting COVID Preventive Intentions
-
-Higher levels of loneliness was associated with lower COVID preventive intentions, for both the current 
-
 ```{r}
-test <- lm(intentions~lonely_current+as.factor(condition), df)
+#Exploratory1. We will test whether higher perceived loneliness will be associated with more negative responses to COVID-19 related measures, including intentions, norms, and beliefs
 
+test <- lm(intentions~lonely_current+as.factor(condition), df)
+##summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(intentions~lonely_prior+as.factor(condition), df)
-
+##summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 ```
 
-# Purpose in Life Moderating the Relationship Between Age and Lonelines {.tabset}
-
-## H1b.
-
-Age will be tested as a potential moderator for H1a, such that higher purpose is more strongly associated with less loneliness for older adults compared to younger adults
-
-
-First, we found that age was negatively associated with loneliness, such that older compared to younger individuals reported feeling less lonely at present 
+# Purpose in Life Moderating the Relationship Between Age and Lonelines
 
 ```{r}
-test <- lm(lonely_current ~ age+as.factor(condition), df)#in the main text
+#H1b. Age will be tested as a potential moderator for H1a, such that higher purpose is more strongly associated with less loneliness for older adults compared to younger adults
 
+test <- lm(lonely_current ~ age+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
-test <- lm(lonely_prior ~ age+as.factor(condition), df)#in the main text
-
+test <- lm(lonely_prior ~ age+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
-```
 
-Contrary to our preregistered prediction, we did not detect a significant interaction between purpose in life and age in predicting current levels of loneliness 
-
-```{r}
 test <- lm(lonely_current~ age*purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
@@ -440,41 +393,37 @@ df$lonely_cen = df$lonely_current - mean(df$lonely_current,na.rm=T)
 df$age_cen = df$age - mean(df$age,na.rm=T)
 df$purpose_cen = df$purpose - mean(df$purpose,na.rm=T)
 df$intentions_cen = df$intentions - mean(df$intentions,na.rm=T)
-#df$lonely_prior_cen = df$lonely_prior - mean(df$lonely_prior,na.rm=T)
 
 df$purpose_low <- df$purpose_cen + sd(df$purpose_cen, na.rm=T)
 df$purpose_high <- df$purpose_cen - sd(df$purpose_cen, na.rm=T)
-```
 
-At higher and mean levels of purpose in life, older age predict less loneliness, at one standard deviation above the mean
-
-```{r}
+#At higher and mean levels of purpose in life, older age was associated with less loneliness, at one standard deviation above the mean and mean levels of purpose in life
 test <-lm(lonely_cen~ purpose_high *age_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(lonely_cen~ purpose_cen *age_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(lonely_cen~ purpose_low *age_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
-#We also conducted a robustness check by dividing the sample at the median purpose score 
+#A robustness check by dividing the sample at the median purpose score 
 purpose_high <- subset(df, purpose >= median(df$purpose))
 purpose_low <- subset(df, purpose < median(df$purpose))
 
 test <-lm(lonely_cen~ age_cen+ as.factor(condition), purpose_high)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(lonely_cen~ age_cen+ as.factor(condition), purpose_low)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 ```
@@ -482,27 +431,27 @@ make_table(test)
 # Exploratory Analyses: The Relationship between Loneliness and COVID Preventive Intentions at Different Levels of Purpose in Life 
 ```{r}
 test <-lm(intentions_cen~ purpose_low *lonely_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(intentions_cen~ purpose_cen *lonely_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(intentions_cen~ purpose_high *lonely_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(intentions ~ lonely_cen+ as.factor(condition), purpose_low)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(intentions ~ lonely_cen+ as.factor(condition), purpose_high)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 ```
@@ -522,6 +471,8 @@ interact_plot(test, pred = purpose, modx = age, interval = TRUE,
 
 ## Table 1
 ```{r}
+
+#visualize correlation matrix 
 h3=df %>%
   dplyr::select("purpose","lonely_current","lonely_prior","intentions", "age", "gender", "ses_subj", "house_size_curre")
 M <- Hmisc::rcorr(as.matrix(h3))
@@ -529,7 +480,7 @@ corrplot(M$r, p.mat = M$P, insig = "label_sig",
          sig.level = c(.001, .05), pch.cex=0.9, pch.col = "white",
          method="color", type="lower")
 
-#table 1. correlation matrix
+#table 1. correlation matrix stats
 cor.test(df$purpose, df$lonely_current)
 cor.test(df$purpose, df$lonely_prior)
 cor.test(df$purpose, df$intentions)
@@ -566,83 +517,67 @@ cor.test(df$gender, df$house_size_curre)
 cor.test(df$ses_subj, df$house_size_curre)
 ```
 
-## Table 2 {.tabset}
-### M1: Purpose in life → Loneliness (current)
+## Table 2
 ```{r}
-test <- lm(lonely_current ~ purpose+as.factor(condition), data=df)#in the main text
-
+#M1: Purpose in life → Loneliness (current)
+test <- lm(lonely_current ~ purpose+as.factor(condition), data=df) 
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
-```
 
-### M2: Purpose in life  → Loneliness (pre-pandemic)
-```{r}
-test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df)#in the main text
-
+#M2: Purpose in life  → Loneliness (pre-pandemic)
+test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df) 
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
-```
 
-### M3: Purpose in life → COVID preventive intentions
-```{r}
-test <- lm(intentions~purpose+as.factor(condition), df) #in the main text
-
+#M3: Purpose in life → COVID preventive intentions
+test <- lm(intentions~purpose+as.factor(condition), df) 
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
-```
 
-### M4: Loneliness (current) → COVID preventive intentions
-```{r}
+#M4: Loneliness (current) → COVID preventive intentions
 test <- lm(intentions~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
-```
 
-### M5: Loneliness (pre-pandemic) → COVID preventive intentions
-```{r}
+#M5: Loneliness (pre-pandemic) → COVID preventive intentions
 test <- lm(intentions~lonely_prior+as.factor(condition), df)
-
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
-```
 
-### M6: Age → Loneliness (current)
-```{r}
-test <- lm(lonely_current ~ age+as.factor(condition), df)#in the main text
-
+#M6: Age → Loneliness (current)
+test <- lm(lonely_current ~ age+as.factor(condition), df) 
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
-```
 
-### M7: Age → Loneliness (pre-pandemic)
-```{r}
-test <- lm(lonely_prior ~ age+as.factor(condition), df)#in the main text
-
+#M7: Age → Loneliness (pre-pandemic)
+test <- lm(lonely_prior ~ age+as.factor(condition), df) 
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
-```
 
-### M8: Purpose in life * Age → Loneliness
-```{r}
+#M8: Purpose in life * Age → Loneliness
 test <- lm(lonely_current~ purpose*age+as.factor(condition), df)
-
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
-```
 
-### M9: Purpose in life * Loneliness → COVID preventive intentions
-```{r}
+#M9: Purpose in life * Loneliness → COVID preventive intentions
 test <- lm(intentions~ purpose*lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 summary(test)
 make_table(test)
@@ -650,229 +585,256 @@ make_table(test)
 
 # SUPPLEMENTALS {.tabset}
 ## SI2
-
-Associations between self-reported purpose in life and responses to COVID-19 related measures, including norms and beliefs. 
-
-Across participants, higher self-reported purpose in life was associated with higher perceived norms about COVID-19 preventative behaviors among social ties
-
 ```{r}
-test <-lm(norms_close~purpose+as.factor(condition), df)
+#SI2. Associations between self-reported purpose in life and responses to COVID-19 related measures, including norms and beliefs. 
 
+test <-lm(norms_close~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
-```
 
-
-Further, higher purpose in life was associated with greater beliefs that taking COVID preventative measures will be approved by their social ties 
-
-```{r}
 test <-lm(beliefs_norms~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(beliefs_safe_others~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(beliefs_safe_self~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 ```
 
 ## SI3
-COVID-related outcomes specifically related to social distancing.
-
-First, higher purpose in life was associated with each of our measured prevention behaviors, including: greater intentions to maintain social distance 
-
 ```{r}
-test <- lm(intentions_sd~purpose+as.factor(condition), df)
+#SI3. COVID-related outcomes specifically related to social distancing.
 
+test <- lm(intentions_sd~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(intentions_hand~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(intentions_home~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
-```
 
-
-Higher purpose also predicted higher perceptions about the normative approval of protective health behaviors including social distancing 
-
-```{r}
+#Higher purpose also predicted higher perceptions about the normative approval of protective health behaviors including social distancing 
 test <- lm(norms_close_sd~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(norms_close_hand~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(norms_close_home~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
-```
 
-Next, we tested whether the association between loneliness and COVID preventive intentions was driven by specific types of protective behavior.  
-
-Higher loneliness predicted worse outcomes for each of the COVID-19 related subcategory behavior: higher loneliness was associated with
-
-```{r}
+#Next, we tested whether the association between loneliness and COVID preventive intentions was driven by specific types of protective behavior.  
+#Higher loneliness predicted worse outcomes for each of the COVID-19 related subcategory behavior: higher loneliness was associated with
 test <- lm(intentions_sd~ lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(intentions_hand~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(intentions_home~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
-```
 
 
-Higher loneliness also predicted lower perceptions about the normative approval of protective health behaviors including social distancing 
-```{r}
+
+#Higher loneliness also predicted lower perceptions about the normative approval of protective health behaviors including social distancing 
 test <- lm(norms_close_sd~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(norms_close_hand~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(norms_close_home~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 ```
 
 ## SI4
-Potential covariates for analysis including loneliness.
-
 ```{r}
+#SI4. Potential covariates for analysis including loneliness. household size, ses/education, gender
+
 summary(lm(lonely_current ~ purpose+as.factor(condition)+house_size_curre+as.factor(gender)+ses_subj, data=df))#continued to be sig
 summary(lm(intentions~lonely_current+as.factor(condition)+house_size_curre+as.factor(gender)+ses_subj, df))#continued to be ns
 summary(lm(lonely_current~age+as.factor(condition)+house_size_curre+as.factor(gender)+ses_subj, df))#continued to be ns
+
+#other potential demographic covariates (age where appropriate)
+
+test <-lm(lonely_current ~ purpose, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+#Higher purpose was also associated with higher COVID preventive intentions in this subsample
+test <-lm(intentions~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(intentions_sd~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(norms_close~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(norms_close_sd~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_norms~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_safe_others~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(beliefs_safe_self~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(intentions ~ lonely_current+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
+test <-lm(intentions_sd ~ lonely_current+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+make_table(test)
+
 ```
 
 ## SI5
-Associations between perceived loneliness and responses to COVID-19 related measures.
-
 ```{r}
+#SI5. Associations between perceived loneliness and responses to COVID-19 related measures.
+ 
 test <- lm(norms_close~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(beliefs_norms~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(beliefs_safe_others~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <- lm(beliefs_safe_self~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
+
 
 ```
 
 ## SI6
-Subsetting the sample to run analyses for the group that were not exposed to messages
-
-In this subsample, higher purpose was associated with lower current levels of loneliness as in the main analysis
-
 ```{r}
+#SI6. Subsetting the sample. 
 df2 =subset (df,condition=='no message control')
-
+#In this subsample, higher purpose was associated with lower current levels of loneliness as in the main analysis
 test <-lm(lonely_current ~ purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
-```
 
-Higher purpose was also associated with higher COVID preventive intentions in this subsample
-
-```{r}
+#Higher purpose was also associated with higher COVID preventive intentions in this subsample
 test <-lm(intentions~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(intentions_sd~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(norms_close~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(norms_close_sd~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(beliefs_norms~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(beliefs_safe_others~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(beliefs_safe_self~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
-```
 
-Consistent with main results, higher loneliness was associated with lower COVID preventive intentions 
+#Consistent with main results, higher loneliness was associated with lower COVID preventive intentions 
 
-```{r}
 test <-lm(intentions ~ lonely_current, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 
 test <-lm(intentions_sd ~ lonely_current, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 make_table(test)
 ```
 
 ## Figure SI
-
-Exploratory simple slopes at four levels of age across three levels of purpose in life.
-
 ```{r}
+#Figure SI.
+#Exploratory simple slopes at four levels of age across three levels of purpose in life.
 test <- lm(intentions ~ lonely_current*age*purpose +as.factor(condition) , df)
 interact_plot(test, pred = lonely_current, modx = age, mod2=purpose, interval = TRUE, 
               int.type = "confidence", int.width = 0.95, modx.values = c(26.4, 37.7, 49, 60.3)) 
