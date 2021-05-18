@@ -1,50 +1,23 @@
 Manuscript Analyses
 ================
-Yoona Kang & Dani Cosme
-2021-04-22
-
-  - [load packages](#load-packages)
-  - [load data](#load-data)
-  - [clean data](#clean-data)
-  - [demographics](#demographics)
-  - [define function to make results
-    table](#define-function-to-make-results-table)
-  - [Purpose in life Predicting Loneliness and COVID-Preventive
-    Intentions](#purpose-in-life-predicting-loneliness-and-covid-preventive-intentions)
-      - [H1a](#h1a)
-      - [H2.](#h2)
-  - [Loneliness Predicting COVID Preventive
-    Intentions](#loneliness-predicting-covid-preventive-intentions)
-  - [Purpose in Life Moderating the Relationship Between Age and
-    Lonelines](#purpose-in-life-moderating-the-relationship-between-age-and-lonelines)
-      - [H1b.](#h1b)
-  - [Exploratory Analyses: The Relationship between Loneliness and COVID
-    Preventive Intentions at Different Levels of Purpose in
-    Life](#exploratory-analyses-the-relationship-between-loneliness-and-covid-preventive-intentions-at-different-levels-of-purpose-in-life)
-  - [TABLE & FIGURE](#table--figure)
-      - [Figure 1.](#figure-1)
-      - [Table 1](#table-1)
-      - [Table 2](#table-2)
-  - [SUPPLEMENTALS](#supplementals)
-      - [SI2](#si2)
-      - [SI3](#si3)
-      - [SI4](#si4)
-      - [SI5](#si5)
-      - [SI6](#si6)
-      - [Figure SI](#figure-si)
+Yoona Kang
+2021-05-18
 
 # load packages
 
 ``` r
-library(lme4)
-library(lmerTest)
-library(ggplot2)
-library(Rcpp)
-library(lm.beta)
-library(psych)
-library(knitr)
-library(tidyverse)
+library("lme4")
+library("lmerTest")
+library("ggplot2")
+library("Rcpp")
+library("lm.beta")
+library("psych")
+library('knitr')
+library('tidyverse')
+#library(ggsci)
+#library(jtools)
 library(interactions)
+#library(gridExtra)
 library(dplyr)
 library(tidyr)
 library(corrplot)
@@ -53,7 +26,7 @@ library(corrplot)
 # load data
 
 ``` r
-df <- read.csv('../data/data_clean_wide.csv', stringsAsFactors = FALSE)
+df <- read.csv('covid19_study1_clean_wide.csv', stringsAsFactors = FALSE)
 ```
 
 # clean data
@@ -100,9 +73,7 @@ df$purpose = rowMeans(df[,c("purpose_1",  "purpose_2r", "purpose_3" , "purpose_4
 
 
 
-
 #calculate intention average scores
-
 
 #all intention items (1-10)
 
@@ -132,26 +103,19 @@ df$intentions1_9r <- ifelse(df$intentions1_9 == 7,1,
                                                                       NA)))))))
 
 
-
-
-
 df$intentions = rowMeans(df[,c("intentions1_1" , "intentions1_2" , "intentions1_3" , "intentions1_4" , 
                                "intentions1_5" , "intentions1_6" , "intentions1_7r" ,  "intentions1_8r" ,  
                                "intentions1_9r" , "intentions1_10")])
 
 
-#intention 1, social distancing items only: 2, 4, 6, 10
+#intention, social distancing items only: 2, 4, 6, 10
 df$intentions_sd = rowMeans(df[,c("intentions1_2","intentions1_4", "intentions1_6", "intentions1_10")])
 
-#intention non sd items: 1, 3, 5, 7r, 8r, 9r
-df$intentions_nsd = rowMeans(df[,c("intentions1_1","intentions1_3", "intentions1_5", "intentions1_7r", "intentions1_8r", "intentions1_9r")])
-
-#intention hand items: 1, 7r, 8r, 9r
+#intention hand washing items: 1, 7r, 8r, 9r
 df$intentions_hand = rowMeans(df[,c("intentions1_1","intentions1_7r", "intentions1_8r", "intentions1_9r")])
 
-#intention home items: 3, 5
+#intention staying home items: 3, 5
 df$intentions_home = rowMeans(df[,c("intentions1_3", "intentions1_5")])
-
 
 
 
@@ -171,16 +135,11 @@ df$norms_close = rowMeans(df[,c("norms_close1_1", "norms_close1_2", "norms_close
 # norms_close social distancing only (2 4 6 10)
 df$norms_close_sd = rowMeans(df[,c("norms_close1_2", "norms_close1_4", "norms_close1_6", "norms_close1_10")])
 
-#norms_close non sd items: 1, 3, 5, 7r, 8r, 9r
-df$norms_close_nsd = rowMeans(df[,c("norms_close1_1","norms_close1_3", "norms_close1_5", "norms_close1_7r", "norms_close1_8r", "norms_close1_9r")])
-
-
-#norms_close hand items: 1, 7r, 8r, 9r
+#norms_close hand washing items: 1, 7r, 8r, 9r
 df$norms_close_hand = rowMeans(df[,c("norms_close1_1","norms_close1_7r", "norms_close1_8r", "norms_close1_9r")])
 
-#norms_close home items: 3, 5
+#norms_close staying home items: 3, 5
 df$norms_close_home = rowMeans(df[,c("norms_close1_3", "norms_close1_5")])
-
 
 
 
@@ -219,29 +178,14 @@ df <- within(df, {
 
 
 
-#subset with available data
+#calculate the relevant data subset
 df_raw <- df
-df =subset (df,lonely_current!='NA')
-df =subset (df,purpose!='NA')
-df =subset (df,intentions !='NA')
+df =subset(df,lonely_current!='NA')
+df =subset(df,purpose!='NA')
+df =subset(df,intentions !='NA')
 
-df$lonely_change = df$lonely_current - df$lonely_prior
-summary(df$lonely_change)
-```
 
-    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ## -5.0000  0.0000  0.0000  0.7427  1.0000  5.0000
-
-``` r
-df$lonely_ave = rowMeans(df[,c("lonely_current","lonely_prior")])
-summary(df$lonely_ave)
-```
-
-    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-    ##   1.000   1.000   3.000   3.085   4.500   7.000
-
-``` r
-#winsorize the following variables
+#winsorize the following variables with outliers +/- 3SD from mean
 table(scale(df$purpose))
 ```
 
@@ -310,30 +254,6 @@ table(scale(df$intentions_sd))
     ##                 16                 16                 16                 37 
     ## -0.106756791446326  0.158595425754398  0.423947642955121  0.689299860155845 
     ##                 50                 51                 65                215
-
-``` r
-table(scale(df$intentions_nsd))
-```
-
-    ## 
-    ##    -3.32707041277696    -2.85295370842038    -2.69491480696818 
-    ##                    1                    2                    1 
-    ##    -2.53687590551599    -2.37883700406379     -2.2207981026116 
-    ##                    4                    4                    3 
-    ##     -2.0627592011594    -1.90472029970721    -1.74668139825501 
-    ##                   12                   20                   11 
-    ##    -1.58864249680282    -1.43060359535062    -1.27256469389843 
-    ##                   15                    9                    1 
-    ##    -1.11452579244623   -0.956486890994038   -0.798447989541843 
-    ##                    5                   11                   13 
-    ##   -0.640409088089649   -0.482370186637454   -0.324331285185259 
-    ##                   11                   17                   14 
-    ##   -0.166292383733064 -0.00825348228086932    0.149785419171326 
-    ##                   25                   40                   23 
-    ##     0.30782432062352    0.465863222075715     0.62390212352791 
-    ##                   30                   39                   21 
-    ##    0.781941024980105      0.9399799264323 
-    ##                   57                  128
 
 ``` r
 table(scale(df$intentions_hand)) 
@@ -564,18 +484,6 @@ table(scale(df$beliefs_safe_others))
     ##                  20                 213
 
 ``` r
-table(scale(df$lonely_change)) 
-```
-
-    ## 
-    ##  -3.93181608191998  -3.24715831352907  -2.56250054513815  -1.87784277674723 
-    ##                  1                  2                  3                  5 
-    ##  -1.19318500835632 -0.508527239965401  0.176130528425516  0.860788296816433 
-    ##                 38                249                 90                 64 
-    ##   1.54544606520735   2.23010383359827   2.91476160198918 
-    ##                 37                 15                 13
-
-``` r
 table(scale(df$house_size_curre))
 ```
 
@@ -620,50 +528,6 @@ table(scale(df$age))
     ##                   3                   3                   1                   1 
     ##     3.1228682256027 
     ##                   1
-
-``` r
-table(scale(df$norms_close_nsd)) #no outlier 
-```
-
-    ## 
-    ##   -2.73947407277166   -2.69091590760839   -2.35100875146547   -2.20533425597564 
-    ##                   1                   1                   1                   1 
-    ##   -2.05965976048582   -1.96254343015927     -1.913985264996   -1.86542709983272 
-    ##                   2                   2                   4                   2 
-    ##   -1.81686893466945   -1.76831076950617    -1.7197526043429   -1.67119443917962 
-    ##                   1                   5                   5                   5 
-    ##   -1.62263627401635   -1.57407810885307    -1.5255199436898   -1.47696177852653 
-    ##                   9                   3                   4                   9 
-    ##   -1.42840361336325   -1.37984544819998    -1.3312872830367   -1.28272911787343 
-    ##                  13                   6                   7                   6 
-    ##   -1.23417095271015   -1.18561278754688    -1.1370546223836   -1.08849645722033 
-    ##                   6                   3                   1                   5 
-    ##   -1.03993829205705   -0.99138012689378  -0.942821961730506  -0.894263796567231 
-    ##                   3                   3                   3                   7 
-    ##  -0.845705631403956  -0.797147466240682  -0.748589301077407  -0.700031135914133 
-    ##                   3                   3                   7                   5 
-    ##  -0.651472970750858  -0.602914805587584  -0.554356640424309  -0.505798475261034 
-    ##                   4                  12                   6                   7 
-    ##   -0.45724031009776  -0.408682144934486  -0.360123979771211  -0.311565814607936 
-    ##                   5                   6                   7                   9 
-    ##  -0.263007649444662  -0.214449484281387  -0.165891319118113  -0.117333153954838 
-    ##                   4                   8                   5                   5 
-    ## -0.0687749887915633  -0.020216823628289  0.0283413415349853  0.0768995066982604 
-    ##                  10                   7                   7                   4 
-    ##   0.125457671861535   0.174015837024809   0.222574002188084   0.271132167351358 
-    ##                   4                  14                   9                  15 
-    ##   0.319690332514633   0.368248497677908   0.416806662841182   0.465364828004456 
-    ##                   9                  16                   6                  15 
-    ##   0.513922993167731   0.562481158331006    0.61103932349428   0.659597488657555 
-    ##                   7                   8                  10                   8 
-    ##   0.708155653820829   0.756713818984104   0.805271984147379   0.853830149310653 
-    ##                   8                   8                   8                   4 
-    ##   0.902388314473927   0.950946479637202   0.999504644800477    1.04806280996375 
-    ##                   7                   8                   8                  14 
-    ##    1.09662097512703     1.1451791402903    1.19373730545357    1.24229547061685 
-    ##                   9                   9                   6                   9 
-    ##    1.29085363578012     1.3394118009434    1.38796996610667    1.43652813126995 
-    ##                  10                   5                   7                  31
 
 ``` r
 table(scale(df$norms_close_hand )) #no outlier 
@@ -760,6 +624,7 @@ table(scale(df$ses_subj))#no outliers
     ##                 13                 10
 
 ``` r
+#replace outliers with +/- 3SD from mean
 df=df %>%
 mutate(mean = mean(purpose, na.rm = TRUE),
        sd3 = 3*sd(purpose, na.rm = TRUE),
@@ -774,10 +639,6 @@ mutate(mean = mean(intentions, na.rm = TRUE),
          sd3 = 3*sd(intentions_sd, na.rm = TRUE),
          intentions_sd = ifelse(intentions_sd > mean + sd3, mean + sd3, intentions_sd), # above --> mean - 3 * SD
          intentions_sd = ifelse(intentions_sd < mean - sd3, mean - sd3, intentions_sd))%>% # below --> mean - 3 * SD
-  mutate(mean = mean(intentions_nsd, na.rm = TRUE),
-         sd3 = 3*sd(intentions_nsd, na.rm = TRUE),
-         intentions_nsd = ifelse(intentions_nsd > mean + sd3, mean + sd3, intentions_nsd), # above --> mean - 3 * SD
-         intentions_nsd = ifelse(intentions_nsd < mean - sd3, mean - sd3, intentions_nsd))%>% # below --> mean - 3 * SD
   mutate(mean = mean(intentions_hand, na.rm = TRUE),
          sd3 = 3*sd(intentions_hand, na.rm = TRUE),
          intentions_hand = ifelse(intentions_hand > mean + sd3, mean + sd3, intentions_hand), # above --> mean - 3 * SD
@@ -806,10 +667,6 @@ mutate(mean = mean(intentions, na.rm = TRUE),
          sd3 = 3*sd(beliefs_safe_others, na.rm = TRUE),
          beliefs_safe_others = ifelse(beliefs_safe_others > mean + sd3, mean + sd3, beliefs_safe_others), # above --> mean - 3 * SD
          beliefs_safe_others = ifelse(beliefs_safe_others < mean - sd3, mean - sd3, beliefs_safe_others))%>%
-  mutate(mean = mean(lonely_change, na.rm = TRUE),
-         sd3 = 3*sd(lonely_change, na.rm = TRUE),
-         lonely_change = ifelse(lonely_change > mean + sd3, mean + sd3, lonely_change), # above --> mean - 3 * SD
-         lonely_change = ifelse(lonely_change < mean - sd3, mean - sd3, lonely_change))%>%
   mutate(mean = mean(house_size_curre, na.rm = TRUE),
          sd3 = 3*sd(house_size_curre, na.rm = TRUE),
          house_size_curre = ifelse(house_size_curre > mean + sd3, mean + sd3, house_size_curre), # above --> mean - 3 * SD
@@ -878,21 +735,21 @@ alpha(df_purpose)
     ## Reliability analysis   
     ## Call: alpha(x = df_purpose)
     ## 
-    ##   raw_alpha std.alpha G6(smc) average_r S/N   ase mean   sd median_r
-    ##       0.81      0.81    0.85      0.38 4.4 0.013  4.3 0.99     0.39
+    ##   raw_alpha std.alpha G6(smc) average_r S/N    ase mean   sd median_r
+    ##       0.81      0.81    0.85      0.38 4.4 0.0098  4.3 0.99     0.39
     ## 
     ##  lower alpha upper     95% confidence boundaries
-    ## 0.79 0.81 0.84 
+    ## 0.79 0.81 0.83 
     ## 
     ##  Reliability if an item is dropped:
     ##            raw_alpha std.alpha G6(smc) average_r S/N alpha se var.r med.r
-    ## purpose_1       0.79      0.79    0.81      0.38 3.7    0.014 0.038  0.45
-    ## purpose_2r      0.76      0.77    0.81      0.36 3.4    0.016 0.043  0.39
-    ## purpose_3       0.80      0.80    0.83      0.39 3.9    0.014 0.033  0.45
-    ## purpose_4r      0.75      0.76    0.79      0.34 3.1    0.018 0.040  0.35
-    ## purpose_5r      0.81      0.82    0.84      0.43 4.5    0.013 0.024  0.39
-    ## purpose_6r      0.79      0.79    0.82      0.39 3.9    0.014 0.041  0.39
-    ## purpose_7       0.79      0.79    0.81      0.39 3.8    0.014 0.030  0.39
+    ## purpose_1       0.79      0.79    0.81      0.38 3.7   0.0108 0.038  0.45
+    ## purpose_2r      0.76      0.77    0.81      0.36 3.4   0.0126 0.043  0.39
+    ## purpose_3       0.80      0.80    0.83      0.39 3.9   0.0104 0.033  0.45
+    ## purpose_4r      0.75      0.76    0.79      0.34 3.1   0.0136 0.040  0.35
+    ## purpose_5r      0.81      0.82    0.84      0.43 4.5   0.0098 0.024  0.39
+    ## purpose_6r      0.79      0.79    0.82      0.39 3.9   0.0112 0.041  0.39
+    ## purpose_7       0.79      0.79    0.81      0.39 3.8   0.0105 0.030  0.39
     ## 
     ##  Item statistics 
     ##              n raw.r std.r r.cor r.drop mean  sd
@@ -906,13 +763,13 @@ alpha(df_purpose)
     ## 
     ## Non missing response frequency for each item
     ##               1    2    3    4    5    6 miss
-    ## purpose_1  0.01 0.05 0.09 0.23 0.36 0.25    0
-    ## purpose_2r 0.04 0.17 0.18 0.15 0.25 0.22    0
-    ## purpose_3  0.01 0.05 0.11 0.25 0.36 0.22    0
-    ## purpose_4r 0.08 0.15 0.15 0.12 0.23 0.26    0
-    ## purpose_5r 0.06 0.12 0.14 0.11 0.23 0.35    0
-    ## purpose_6r 0.08 0.13 0.17 0.18 0.24 0.20    0
-    ## purpose_7  0.04 0.07 0.10 0.22 0.33 0.23    0
+    ## purpose_1  0.01 0.05 0.09 0.23 0.36 0.25  0.4
+    ## purpose_2r 0.04 0.17 0.18 0.15 0.25 0.22  0.4
+    ## purpose_3  0.01 0.05 0.11 0.25 0.36 0.22  0.4
+    ## purpose_4r 0.08 0.15 0.15 0.12 0.23 0.26  0.4
+    ## purpose_5r 0.06 0.12 0.14 0.11 0.23 0.35  0.4
+    ## purpose_6r 0.08 0.13 0.17 0.18 0.24 0.20  0.4
+    ## purpose_7  0.04 0.07 0.10 0.22 0.33 0.23  0.4
 
 ``` r
 df_intention <- df_raw[ , c("intentions1_1" , "intentions1_2" , "intentions1_3" , "intentions1_4" , 
@@ -925,50 +782,50 @@ alpha(df_intention)
     ## Reliability analysis   
     ## Call: alpha(x = df_intention)
     ## 
-    ##   raw_alpha std.alpha G6(smc) average_r S/N   ase mean  sd median_r
-    ##       0.82      0.84    0.86      0.35 5.3 0.012  6.1 0.9     0.32
+    ##   raw_alpha std.alpha G6(smc) average_r S/N   ase mean   sd median_r
+    ##       0.82      0.84    0.86      0.35 5.4 0.009  6.2 0.88     0.32
     ## 
     ##  lower alpha upper     95% confidence boundaries
-    ## 0.79 0.82 0.84 
+    ## 0.8 0.82 0.84 
     ## 
     ##  Reliability if an item is dropped:
     ##                raw_alpha std.alpha G6(smc) average_r S/N alpha se var.r med.r
-    ## intentions1_1       0.80      0.83    0.85      0.34 4.7    0.013 0.028  0.30
-    ## intentions1_2       0.79      0.82    0.84      0.34 4.5    0.013 0.024  0.30
-    ## intentions1_3       0.80      0.83    0.86      0.35 4.9    0.013 0.028  0.31
-    ## intentions1_4       0.80      0.83    0.85      0.35 4.8    0.013 0.024  0.33
-    ## intentions1_5       0.83      0.85    0.87      0.39 5.7    0.011 0.019  0.36
-    ## intentions1_6       0.79      0.81    0.84      0.33 4.4    0.014 0.023  0.30
-    ## intentions1_7r      0.80      0.83    0.85      0.36 5.0    0.013 0.023  0.36
-    ## intentions1_8r      0.80      0.83    0.84      0.35 4.9    0.013 0.020  0.36
-    ## intentions1_9r      0.78      0.82    0.84      0.34 4.6    0.015 0.023  0.30
-    ## intentions1_10      0.79      0.82    0.84      0.33 4.4    0.013 0.024  0.30
+    ## intentions1_1       0.80      0.83    0.85      0.35 4.8   0.0098 0.022  0.29
+    ## intentions1_2       0.80      0.82    0.84      0.34 4.7   0.0100 0.020  0.31
+    ## intentions1_3       0.81      0.84    0.85      0.36 5.1   0.0096 0.022  0.32
+    ## intentions1_4       0.80      0.83    0.85      0.35 4.9   0.0098 0.020  0.32
+    ## intentions1_5       0.83      0.85    0.86      0.39 5.7   0.0081 0.015  0.34
+    ## intentions1_6       0.80      0.82    0.83      0.33 4.5   0.0100 0.018  0.30
+    ## intentions1_7r      0.80      0.83    0.85      0.35 5.0   0.0102 0.018  0.32
+    ## intentions1_8r      0.80      0.83    0.84      0.35 4.9   0.0102 0.016  0.33
+    ## intentions1_9r      0.79      0.82    0.84      0.34 4.7   0.0107 0.017  0.31
+    ## intentions1_10      0.80      0.82    0.84      0.34 4.5   0.0101 0.019  0.31
     ## 
     ##  Item statistics 
     ##                  n raw.r std.r r.cor r.drop mean   sd
-    ## intentions1_1  517  0.62  0.66  0.60   0.54  6.5 1.04
-    ## intentions1_2  517  0.67  0.71  0.68   0.58  6.2 1.29
-    ## intentions1_3  517  0.57  0.62  0.55   0.48  6.6 1.05
-    ## intentions1_4  517  0.59  0.63  0.58   0.48  6.2 1.31
-    ## intentions1_5  517  0.43  0.41  0.31   0.25  6.0 1.81
-    ## intentions1_6  517  0.70  0.76  0.75   0.64  6.4 0.99
-    ## intentions1_7r 517  0.67  0.59  0.55   0.52  5.3 1.91
-    ## intentions1_8r 517  0.68  0.60  0.57   0.53  5.6 1.90
-    ## intentions1_9r 517  0.74  0.69  0.67   0.63  6.1 1.79
-    ## intentions1_10 517  0.69  0.74  0.72   0.62  6.5 1.03
+    ## intentions1_1  865  0.61  0.66  0.60   0.53  6.5 0.99
+    ## intentions1_2  865  0.66  0.69  0.66   0.56  6.2 1.28
+    ## intentions1_3  865  0.54  0.59  0.51   0.46  6.7 0.97
+    ## intentions1_4  865  0.61  0.65  0.60   0.51  6.2 1.28
+    ## intentions1_5  865  0.47  0.44  0.34   0.28  6.0 1.80
+    ## intentions1_6  865  0.69  0.75  0.73   0.63  6.5 0.96
+    ## intentions1_7r 865  0.69  0.62  0.58   0.55  5.3 1.92
+    ## intentions1_8r 865  0.69  0.63  0.60   0.56  5.7 1.81
+    ## intentions1_9r 865  0.73  0.69  0.67   0.62  6.2 1.71
+    ## intentions1_10 865  0.68  0.73  0.71   0.61  6.5 1.01
     ## 
     ## Non missing response frequency for each item
     ##                   1    2    3    4    5    6    7 miss
-    ## intentions1_1  0.01 0.01 0.01 0.03 0.06 0.20 0.68    0
-    ## intentions1_2  0.02 0.01 0.02 0.03 0.09 0.24 0.58    0
-    ## intentions1_3  0.01 0.01 0.02 0.02 0.05 0.07 0.83    0
-    ## intentions1_4  0.02 0.02 0.01 0.07 0.08 0.18 0.62    0
-    ## intentions1_5  0.08 0.02 0.01 0.04 0.07 0.15 0.63    0
-    ## intentions1_6  0.01 0.00 0.02 0.02 0.07 0.23 0.65    0
-    ## intentions1_7r 0.04 0.09 0.08 0.10 0.09 0.20 0.39    0
-    ## intentions1_8r 0.05 0.07 0.06 0.05 0.05 0.21 0.51    0
-    ## intentions1_9r 0.04 0.06 0.05 0.02 0.01 0.09 0.74    0
-    ## intentions1_10 0.01 0.01 0.01 0.01 0.07 0.14 0.74    0
+    ## intentions1_1  0.00 0.01 0.01 0.03 0.07 0.20 0.68    0
+    ## intentions1_2  0.02 0.02 0.02 0.04 0.08 0.23 0.59    0
+    ## intentions1_3  0.01 0.01 0.02 0.01 0.04 0.08 0.83    0
+    ## intentions1_4  0.01 0.02 0.01 0.06 0.09 0.19 0.62    0
+    ## intentions1_5  0.07 0.03 0.02 0.04 0.07 0.12 0.66    0
+    ## intentions1_6  0.01 0.00 0.01 0.02 0.06 0.23 0.67    0
+    ## intentions1_7r 0.05 0.09 0.09 0.09 0.09 0.21 0.38    0
+    ## intentions1_8r 0.04 0.06 0.06 0.05 0.06 0.23 0.51    0
+    ## intentions1_9r 0.03 0.06 0.04 0.02 0.02 0.09 0.74    0
+    ## intentions1_10 0.01 0.01 0.01 0.02 0.06 0.14 0.75    0
 
 # define function to make results table
 
@@ -999,17 +856,11 @@ make_table = function(model) {
 
 # Purpose in life Predicting Loneliness and COVID-Preventive Intentions
 
-## H1a
-
-Higher self-reported purpose in life will be associated with less
-perceived loneliness.
-
-As preregistered, across participants, higher self-reported purpose in
-life was associated with lower loneliness, for both the current
-
 ``` r
-test <- lm(lonely_current ~ purpose+as.factor(condition), data=df)#in the main text
+#H1a. Higher self-reported purpose in life will be associated with less perceived loneliness.
 
+test <- lm(lonely_current ~ purpose+as.factor(condition), data=df)
+##summ(test, digits = 3, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -1082,8 +933,8 @@ make_table(test)
     ## (condition)norm                  -0.65  -1.23, -0.06    0.30   -2.18  .030
 
 ``` r
-test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df)#in the main text
-
+test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df)
+##summ(test, digits = 3, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -1153,15 +1004,10 @@ make_table(test)
     ## (condition)no message control    -0.40  -0.83, 0.03     0.22    -1.84  .067   
     ## (condition)norm                  -0.34  -0.84, 0.16     0.25    -1.32  .188
 
-## H2.
-
-Higher self-reported purpose in life will be associated with more
-positive responses to COVID-19 related measures, including intentions,
-norms, and beliefs.
-
 ``` r
-test <- lm(intentions~purpose+as.factor(condition), df) #in the main text
-
+#H2. Higher self-reported purpose in life will be associated with more positive responses to COVID-19 related measures, including intentions, norms, and beliefs.
+test <- lm(intentions~purpose+as.factor(condition), df)
+##summ(test, digits = 3, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -1233,12 +1079,11 @@ make_table(test)
 
 # Loneliness Predicting COVID Preventive Intentions
 
-Higher levels of loneliness was associated with lower COVID preventive
-intentions, for both the current
-
 ``` r
-test <- lm(intentions~lonely_current+as.factor(condition), df)
+#Exploratory1. We will test whether higher perceived loneliness will be associated with more negative responses to COVID-19 related measures, including intentions, norms, and beliefs
 
+test <- lm(intentions~lonely_current+as.factor(condition), df)
+##summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1295,7 +1140,7 @@ make_table(test)
 
 ``` r
 test <- lm(intentions~lonely_prior+as.factor(condition), df)
-
+##summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1352,19 +1197,11 @@ make_table(test)
 
 # Purpose in Life Moderating the Relationship Between Age and Lonelines
 
-## H1b.
-
-Age will be tested as a potential moderator for H1a, such that higher
-purpose is more strongly associated with less loneliness for older
-adults compared to younger adults
-
-First, we found that age was negatively associated with loneliness, such
-that older compared to younger individuals reported feeling less lonely
-at present
-
 ``` r
-test <- lm(lonely_current ~ age+as.factor(condition), df)#in the main text
+#H1b. Age will be tested as a potential moderator for H1a, such that higher purpose is more strongly associated with less loneliness for older adults compared to younger adults
 
+test <- lm(lonely_current ~ age+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1419,8 +1256,8 @@ make_table(test)
     ## (condition)norm                  -0.79  -1.41, -0.17    0.32   -2.50  .013
 
 ``` r
-test <- lm(lonely_prior ~ age+as.factor(condition), df)#in the main text
-
+test <- lm(lonely_prior ~ age+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1474,13 +1311,9 @@ make_table(test)
     ## (condition)no message control    -0.40  -0.89, 0.09     0.25   -1.60  .110   
     ## (condition)norm                  -0.52  -1.09, 0.05     0.29   -1.79  .074
 
-Contrary to our preregistered prediction, we did not detect a
-significant interaction between purpose in life and age in predicting
-current levels of loneliness
-
 ``` r
 test <- lm(lonely_current~ age*purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1565,18 +1398,13 @@ df$lonely_cen = df$lonely_current - mean(df$lonely_current,na.rm=T)
 df$age_cen = df$age - mean(df$age,na.rm=T)
 df$purpose_cen = df$purpose - mean(df$purpose,na.rm=T)
 df$intentions_cen = df$intentions - mean(df$intentions,na.rm=T)
-#df$lonely_prior_cen = df$lonely_prior - mean(df$lonely_prior,na.rm=T)
 
 df$purpose_low <- df$purpose_cen + sd(df$purpose_cen, na.rm=T)
 df$purpose_high <- df$purpose_cen - sd(df$purpose_cen, na.rm=T)
-```
 
-At higher and mean levels of purpose in life, older age predict less
-loneliness, at one standard deviation above the mean
-
-``` r
+#At higher and mean levels of purpose in life, older age was associated with less loneliness, at one standard deviation above the mean and mean levels of purpose in life
 test <-lm(lonely_cen~ purpose_high *age_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1639,7 +1467,7 @@ make_table(test)
 
 ``` r
 test <-lm(lonely_cen~ purpose_cen *age_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1702,7 +1530,7 @@ make_table(test)
 
 ``` r
 test <-lm(lonely_cen~ purpose_low *age_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1764,12 +1592,12 @@ make_table(test)
     ## purpose_low:age_cen              -0.01  -0.02, 0.01     0.01   -1.07  .287
 
 ``` r
-#We also conducted a robustness check by dividing the sample at the median purpose score 
+#A robustness check by dividing the sample at the median purpose score 
 purpose_high <- subset(df, purpose >= median(df$purpose))
 purpose_low <- subset(df, purpose < median(df$purpose))
 
 test <-lm(lonely_cen~ age_cen+ as.factor(condition), purpose_high)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1818,7 +1646,7 @@ make_table(test)
 
 ``` r
 test <-lm(lonely_cen~ age_cen+ as.factor(condition), purpose_low)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1869,7 +1697,7 @@ make_table(test)
 
 ``` r
 test <-lm(intentions_cen~ purpose_low *lonely_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1932,7 +1760,7 @@ make_table(test)
 
 ``` r
 test <-lm(intentions_cen~ purpose_cen *lonely_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1995,7 +1823,7 @@ make_table(test)
 
 ``` r
 test <-lm(intentions_cen~ purpose_high *lonely_cen+ as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -2058,7 +1886,7 @@ make_table(test)
 
 ``` r
 test <-lm(intentions ~ lonely_cen+ as.factor(condition), purpose_low)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -2115,7 +1943,7 @@ make_table(test)
 
 ``` r
 test <-lm(intentions ~ lonely_cen+ as.factor(condition), purpose_high)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -2181,7 +2009,7 @@ interact_plot(test, pred = age, modx = purpose, interval = TRUE,
               int.type = "confidence", int.width = 0.95) 
 ```
 
-![](analysis_code_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](analysis_code_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 #B. Simple slopes analysis showing the relationship between purpose in life and current loneliness across age, at one standard deviation below the mean (26.4 years), mean (37.7 years), one standard deviation above the mean (49 years), and two standard deviations above the mean (60.3 years) ages.
@@ -2189,11 +2017,12 @@ interact_plot(test, pred = purpose, modx = age, interval = TRUE,
               int.type = "confidence", int.width = 0.95, modx.values = c(26.4, 37.7, 49, 60.3)) 
 ```
 
-![](analysis_code_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
+![](analysis_code_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
 
 ## Table 1
 
 ``` r
+#visualize correlation matrix 
 h3=df %>%
   dplyr::select("purpose","lonely_current","lonely_prior","intentions", "age", "gender", "ses_subj", "house_size_curre")
 M <- Hmisc::rcorr(as.matrix(h3))
@@ -2202,10 +2031,10 @@ corrplot(M$r, p.mat = M$P, insig = "label_sig",
          method="color", type="lower")
 ```
 
-![](analysis_code_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](analysis_code_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
-#table 1. correlation matrix
+#table 1. correlation matrix stats
 cor.test(df$purpose, df$lonely_current)
 ```
 
@@ -2655,11 +2484,10 @@ cor.test(df$ses_subj, df$house_size_curre)
 
 ## Table 2
 
-### M1: Purpose in life → Loneliness (current)
-
 ``` r
-test <- lm(lonely_current ~ purpose+as.factor(condition), data=df)#in the main text
-
+#M1: Purpose in life → Loneliness (current)
+test <- lm(lonely_current ~ purpose+as.factor(condition), data=df) 
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -2731,11 +2559,10 @@ make_table(test)
     ## (condition)no message control    -0.62  -1.12, -0.12    0.25   -2.45  .015   
     ## (condition)norm                  -0.65  -1.23, -0.06    0.30   -2.18  .030
 
-### M2: Purpose in life → Loneliness (pre-pandemic)
-
 ``` r
-test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df)#in the main text
-
+#M2: Purpose in life  → Loneliness (pre-pandemic)
+test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df) 
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -2805,11 +2632,10 @@ make_table(test)
     ## (condition)no message control    -0.40  -0.83, 0.03     0.22    -1.84  .067   
     ## (condition)norm                  -0.34  -0.84, 0.16     0.25    -1.32  .188
 
-### M3: Purpose in life → COVID preventive intentions
-
 ``` r
-test <- lm(intentions~purpose+as.factor(condition), df) #in the main text
-
+#M3: Purpose in life → COVID preventive intentions
+test <- lm(intentions~purpose+as.factor(condition), df) 
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -2879,11 +2705,10 @@ make_table(test)
     ## (condition)no message control    -0.05  -0.27, 0.17    0.11   -0.45  .655   
     ## (condition)norm                  -0.02  -0.28, 0.23    0.13   -0.18  .857
 
-### M4: Loneliness (current) → COVID preventive intentions
-
 ``` r
+#M4: Loneliness (current) → COVID preventive intentions
 test <- lm(intentions~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -2955,11 +2780,10 @@ make_table(test)
     ## (condition)no message control    -0.12  -0.35, 0.11     0.12   -1.00  .319   
     ## (condition)norm                  -0.04  -0.31, 0.23     0.14   -0.29  .773
 
-### M5: Loneliness (pre-pandemic) → COVID preventive intentions
-
 ``` r
+#M5: Loneliness (pre-pandemic) → COVID preventive intentions
 test <- lm(intentions~lonely_prior+as.factor(condition), df)
-
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -3031,11 +2855,10 @@ make_table(test)
     ## (condition)no message control    -0.12  -0.34, 0.10     0.11   -1.09  .277   
     ## (condition)norm                  -0.05  -0.30, 0.21     0.13   -0.37  .713
 
-### M6: Age → Loneliness (current)
-
 ``` r
-test <- lm(lonely_current ~ age+as.factor(condition), df)#in the main text
-
+#M6: Age → Loneliness (current)
+test <- lm(lonely_current ~ age+as.factor(condition), df) 
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -3105,11 +2928,10 @@ make_table(test)
     ## (condition)no message control    -0.62  -1.16, -0.09    0.27   -2.28  .023   
     ## (condition)norm                  -0.79  -1.41, -0.17    0.32   -2.50  .013
 
-### M7: Age → Loneliness (pre-pandemic)
-
 ``` r
-test <- lm(lonely_prior ~ age+as.factor(condition), df)#in the main text
-
+#M7: Age → Loneliness (pre-pandemic)
+test <- lm(lonely_prior ~ age+as.factor(condition), df) 
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -3179,11 +3001,10 @@ make_table(test)
     ## (condition)no message control    -0.40  -0.89, 0.09     0.25   -1.60  .110   
     ## (condition)norm                  -0.52  -1.09, 0.05     0.29   -1.79  .074
 
-### M8: Purpose in life \* Age → Loneliness
-
 ``` r
+#M8: Purpose in life * Age → Loneliness
 test <- lm(lonely_current~ purpose*age+as.factor(condition), df)
-
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -3263,11 +3084,10 @@ make_table(test)
     ## (condition)norm                  -0.65  -1.23, -0.07    0.30   -2.19  .029   
     ## purpose:age                      -0.01  -0.02, 0.01     0.01   -1.07  .287
 
-### M9: Purpose in life \* Loneliness → COVID preventive intentions
-
 ``` r
+#M9: Purpose in life * Loneliness → COVID preventive intentions
 test <- lm(intentions~ purpose*lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -3351,16 +3171,11 @@ make_table(test)
 
 ## SI2
 
-Associations between self-reported purpose in life and responses to
-COVID-19 related measures, including norms and beliefs.
-
-Across participants, higher self-reported purpose in life was associated
-with higher perceived norms about COVID-19 preventative behaviors among
-social ties
-
 ``` r
-test <-lm(norms_close~purpose+as.factor(condition), df)
+#SI2. Associations between self-reported purpose in life and responses to COVID-19 related measures, including norms and beliefs. 
 
+test <-lm(norms_close~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3415,12 +3230,9 @@ make_table(test)
     ## (condition)no message control     2.94  -1.12, 6.99     2.06    1.42  .156   
     ## (condition)norm                  -0.49  -5.23, 4.24     2.41   -0.20  .838
 
-Further, higher purpose in life was associated with greater beliefs that
-taking COVID preventative measures will be approved by their social ties
-
 ``` r
 test <-lm(beliefs_norms~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3477,7 +3289,7 @@ make_table(test)
 
 ``` r
 test <-lm(beliefs_safe_others~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3534,7 +3346,7 @@ make_table(test)
 
 ``` r
 test <-lm(beliefs_safe_self~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3591,15 +3403,11 @@ make_table(test)
 
 ## SI3
 
-COVID-related outcomes specifically related to social distancing.
-
-First, higher purpose in life was associated with each of our measured
-prevention behaviors, including: greater intentions to maintain social
-distance
-
 ``` r
-test <- lm(intentions_sd~purpose+as.factor(condition), df)
+#SI3. COVID-related outcomes specifically related to social distancing.
 
+test <- lm(intentions_sd~purpose+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3656,7 +3464,7 @@ make_table(test)
 
 ``` r
 test <- lm(intentions_hand~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3713,7 +3521,7 @@ make_table(test)
 
 ``` r
 test <- lm(intentions_home~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3768,12 +3576,10 @@ make_table(test)
     ## (condition)no message control     0.07  -0.23, 0.36    0.15    0.44  .660   
     ## (condition)norm                   0.14  -0.20, 0.48    0.17    0.82  .414
 
-Higher purpose also predicted higher perceptions about the normative
-approval of protective health behaviors including social distancing
-
 ``` r
+#Higher purpose also predicted higher perceptions about the normative approval of protective health behaviors including social distancing 
 test <- lm(norms_close_sd~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3831,7 +3637,7 @@ make_table(test)
 
 ``` r
 test <- lm(norms_close_hand~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3889,7 +3695,7 @@ make_table(test)
 
 ``` r
 test <- lm(norms_close_home~purpose+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3945,16 +3751,11 @@ make_table(test)
     ## (condition)no message control    -0.82  -6.03, 4.39     2.65   -0.31  .757   
     ## (condition)norm                  -1.74  -7.82, 4.33     3.09   -0.56  .573
 
-Next, we tested whether the association between loneliness and COVID
-preventive intentions was driven by specific types of protective
-behavior.
-
-Higher loneliness predicted worse outcomes for each of the COVID-19
-related subcategory behavior: higher loneliness was associated with
-
 ``` r
+#Next, we tested whether the association between loneliness and COVID preventive intentions was driven by specific types of protective behavior.  
+#Higher loneliness predicted worse outcomes for each of the COVID-19 related subcategory behavior: higher loneliness was associated with
 test <- lm(intentions_sd~ lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4011,7 +3812,7 @@ make_table(test)
 
 ``` r
 test <- lm(intentions_hand~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4068,7 +3869,7 @@ make_table(test)
 
 ``` r
 test <- lm(intentions_home~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4123,12 +3924,10 @@ make_table(test)
     ## (condition)no message control     0.04  -0.26, 0.33    0.15    0.25  .805   
     ## (condition)norm                   0.14  -0.21, 0.48    0.18    0.79  .427
 
-Higher loneliness also predicted lower perceptions about the normative
-approval of protective health behaviors including social distancing
-
 ``` r
+#Higher loneliness also predicted lower perceptions about the normative approval of protective health behaviors including social distancing 
 test <- lm(norms_close_sd~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4186,7 +3985,7 @@ make_table(test)
 
 ``` r
 test <- lm(norms_close_hand~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4244,7 +4043,7 @@ make_table(test)
 
 ``` r
 test <- lm(norms_close_home~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4302,9 +4101,9 @@ make_table(test)
 
 ## SI4
 
-Potential covariates for analysis including loneliness.
-
 ``` r
+#SI4. Potential covariates for analysis including loneliness. household size, ses/education, gender
+
 summary(lm(lonely_current ~ purpose+as.factor(condition)+house_size_curre+as.factor(gender)+ses_subj, data=df))#continued to be sig
 ```
 
@@ -4436,14 +4235,446 @@ summary(lm(lonely_current~age+as.factor(condition)+house_size_curre+as.factor(ge
     ## Multiple R-squared:  0.0439, Adjusted R-squared:  0.02465 
     ## F-statistic: 2.281 on 9 and 447 DF,  p-value: 0.01657
 
-## SI5
+``` r
+#other potential demographic covariates (age where appropriate)
 
-Associations between perceived loneliness and responses to COVID-19
-related measures.
+test <-lm(lonely_current ~ purpose, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = lonely_current ~ purpose, data = df)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -4.7449 -1.5842 -0.0107  1.6477  4.8547 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value            Pr(>|t|)    
+    ## (Intercept)   6.7539     0.3696  18.271 <0.0000000000000002 ***
+    ## purpose      -0.7681     0.0839  -9.155 <0.0000000000000002 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.892 on 515 degrees of freedom
+    ## Multiple R-squared:   0.14,  Adjusted R-squared:  0.1383 
+    ## F-statistic: 83.82 on 1 and 515 DF,  p-value: < 0.00000000000000022
 
 ``` r
-test <- lm(norms_close~lonely_current+as.factor(condition), df)
+make_table(test)
+```
 
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.14          0.14   515
+    ## 
+    ## 
+    ## term               b  95% CI            SE       t  p      
+    ## ------------  ------  -------------  -----  ------  -------
+    ## (Intercept)     6.75  6.03, 7.48      0.37   18.27  < .001 
+    ## purpose        -0.77  -0.93, -0.60    0.08   -9.16  < .001
+
+``` r
+#Higher purpose was also associated with higher COVID preventive intentions in this subsample
+test <-lm(intentions~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = intentions ~ purpose + age, data = df)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.1630 -0.4153  0.2312  0.5630  1.6323 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value             Pr(>|t|)    
+    ## (Intercept) 4.420979   0.193563  22.840 < 0.0000000000000002 ***
+    ## purpose     0.326245   0.036415   8.959 < 0.0000000000000002 ***
+    ## age         0.008654   0.003202   2.703              0.00711 ** 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.819 on 514 degrees of freedom
+    ## Multiple R-squared:  0.1515, Adjusted R-squared:  0.1482 
+    ## F-statistic: 45.87 on 2 and 514 DF,  p-value: < 0.00000000000000022
+
+``` r
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.15          0.15   514
+    ## 
+    ## 
+    ## term              b  95% CI          SE       t  p      
+    ## ------------  -----  -----------  -----  ------  -------
+    ## (Intercept)    4.42  4.04, 4.80    0.19   22.84  < .001 
+    ## purpose        0.33  0.25, 0.40    0.04    8.96  < .001 
+    ## age            0.01  0.00, 0.01    0.00    2.70  .007
+
+``` r
+test <-lm(intentions_sd~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = intentions_sd ~ purpose + age, data = df)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.1850 -0.2725  0.2820  0.5056  1.1301 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value             Pr(>|t|)    
+    ## (Intercept) 5.157287   0.191108  26.986 < 0.0000000000000002 ***
+    ## purpose     0.205367   0.035953   5.712         0.0000000189 ***
+    ## age         0.008879   0.003161   2.809              0.00516 ** 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.8086 on 514 degrees of freedom
+    ## Multiple R-squared:  0.0775, Adjusted R-squared:  0.07391 
+    ## F-statistic: 21.59 on 2 and 514 DF,  p-value: 0.0000000009915
+
+``` r
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.08          0.07   514
+    ## 
+    ## 
+    ## term              b  95% CI          SE       t  p      
+    ## ------------  -----  -----------  -----  ------  -------
+    ## (Intercept)    5.16  4.78, 5.53    0.19   26.99  < .001 
+    ## purpose        0.21  0.13, 0.28    0.04    5.71  < .001 
+    ## age            0.01  0.00, 0.02    0.00    2.81  .005
+
+``` r
+test <-lm(norms_close~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = norms_close ~ purpose + age, data = df)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -55.608 -10.403   1.302  11.509  31.409 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value             Pr(>|t|)    
+    ## (Intercept) 48.31418    3.56752  13.543 < 0.0000000000000002 ***
+    ## purpose      4.72920    0.67064   7.052     0.00000000000576 ***
+    ## age          0.19743    0.05917   3.336              0.00091 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 15.07 on 511 degrees of freedom
+    ##   (3 observations deleted due to missingness)
+    ## Multiple R-squared:  0.1125, Adjusted R-squared:  0.109 
+    ## F-statistic: 32.38 on 2 and 511 DF,  p-value: 0.00000000000005772
+
+``` r
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.11          0.11   511
+    ## 
+    ## 
+    ## term               b  95% CI            SE       t  p      
+    ## ------------  ------  -------------  -----  ------  -------
+    ## (Intercept)    48.31  41.31, 55.32    3.57   13.54  < .001 
+    ## purpose         4.73  3.41, 6.05      0.67    7.05  < .001 
+    ## age             0.20  0.08, 0.31      0.06    3.34  < .001
+
+``` r
+test <-lm(norms_close_sd~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = norms_close_sd ~ purpose + age, data = df)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -61.538 -10.279   3.888  13.647  31.546 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value             Pr(>|t|)    
+    ## (Intercept) 53.84028    4.24864  12.672 < 0.0000000000000002 ***
+    ## purpose      3.63005    0.79857   4.546           0.00000684 ***
+    ## age          0.20375    0.07029   2.899              0.00391 ** 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 17.95 on 512 degrees of freedom
+    ##   (2 observations deleted due to missingness)
+    ## Multiple R-squared:  0.05738,    Adjusted R-squared:  0.0537 
+    ## F-statistic: 15.58 on 2 and 512 DF,  p-value: 0.0000002692
+
+``` r
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.06          0.05   512
+    ## 
+    ## 
+    ## term               b  95% CI            SE       t  p      
+    ## ------------  ------  -------------  -----  ------  -------
+    ## (Intercept)    53.84  45.49, 62.19    4.25   12.67  < .001 
+    ## purpose         3.63  2.06, 5.20      0.80    4.55  < .001 
+    ## age             0.20  0.07, 0.34      0.07    2.90  .004
+
+``` r
+test <-lm(beliefs_norms~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = beliefs_norms ~ purpose + age, data = df)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.2766 -0.7762  0.2313  0.8050  2.2288 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value             Pr(>|t|)    
+    ## (Intercept) 4.123089   0.248156  16.615 < 0.0000000000000002 ***
+    ## purpose     0.363051   0.046686   7.776   0.0000000000000411 ***
+    ## age         0.006340   0.004105   1.544                0.123    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 1.05 on 514 degrees of freedom
+    ## Multiple R-squared:  0.1123, Adjusted R-squared:  0.1089 
+    ## F-statistic: 32.52 on 2 and 514 DF,  p-value: 0.00000000000005028
+
+``` r
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.11          0.11   514
+    ## 
+    ## 
+    ## term              b  95% CI           SE       t  p      
+    ## ------------  -----  ------------  -----  ------  -------
+    ## (Intercept)    4.12  3.64, 4.61     0.25   16.61  < .001 
+    ## purpose        0.36  0.27, 0.45     0.05    7.78  < .001 
+    ## age            0.01  -0.00, 0.01    0.00    1.54  .123
+
+``` r
+test <-lm(beliefs_safe_others~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = beliefs_safe_others ~ purpose + age, data = df)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.7851 -0.4416  0.3154  0.6138  1.4076 
+    ## 
+    ## Coefficients:
+    ##              Estimate Std. Error t value             Pr(>|t|)    
+    ## (Intercept) 4.8853498  0.2289054  21.342 < 0.0000000000000002 ***
+    ## purpose     0.3048806  0.0430643   7.080     0.00000000000477 ***
+    ## age         0.0003644  0.0037867   0.096                0.923    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.9686 on 514 degrees of freedom
+    ## Multiple R-squared:  0.08949,    Adjusted R-squared:  0.08595 
+    ## F-statistic: 25.26 on 2 and 514 DF,  p-value: 0.00000000003433
+
+``` r
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.09          0.09   514
+    ## 
+    ## 
+    ## term              b  95% CI           SE       t  p      
+    ## ------------  -----  ------------  -----  ------  -------
+    ## (Intercept)    4.89  4.44, 5.34     0.23   21.34  < .001 
+    ## purpose        0.30  0.22, 0.39     0.04    7.08  < .001 
+    ## age            0.00  -0.01, 0.01    0.00    0.10  .923
+
+``` r
+test <-lm(beliefs_safe_self~purpose+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = beliefs_safe_self ~ purpose + age, data = df)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -3.2512 -0.4141  0.2512  0.5521  1.4277 
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error t value             Pr(>|t|)    
+    ## (Intercept) 4.830114   0.197906  24.406 < 0.0000000000000002 ***
+    ## purpose     0.292864   0.037232   7.866   0.0000000000000218 ***
+    ## age         0.004583   0.003274   1.400                0.162    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.8374 on 514 degrees of freedom
+    ## Multiple R-squared:  0.1136, Adjusted R-squared:  0.1101 
+    ## F-statistic: 32.93 on 2 and 514 DF,  p-value: 0.00000000000003484
+
+``` r
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.11          0.11   514
+    ## 
+    ## 
+    ## term              b  95% CI           SE       t  p      
+    ## ------------  -----  ------------  -----  ------  -------
+    ## (Intercept)    4.83  4.44, 5.22     0.20   24.41  < .001 
+    ## purpose        0.29  0.22, 0.37     0.04    7.87  < .001 
+    ## age            0.00  -0.00, 0.01    0.00    1.40  .162
+
+``` r
+test <-lm(intentions ~ lonely_current+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = intentions ~ lonely_current + age, data = df)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -2.7465 -0.4409  0.2135  0.6315  1.2774 
+    ## 
+    ## Coefficients:
+    ##                 Estimate Std. Error t value             Pr(>|t|)    
+    ## (Intercept)     6.189562   0.153890  40.221 < 0.0000000000000002 ***
+    ## lonely_current -0.104061   0.018616  -5.590         0.0000000369 ***
+    ## age             0.008433   0.003361   2.509               0.0124 *  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.855 on 514 degrees of freedom
+    ## Multiple R-squared:  0.07517,    Adjusted R-squared:  0.07158 
+    ## F-statistic: 20.89 on 2 and 514 DF,  p-value: 0.000000001894
+
+``` r
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.08          0.07   514
+    ## 
+    ## 
+    ## term                  b  95% CI            SE       t  p      
+    ## ---------------  ------  -------------  -----  ------  -------
+    ## (Intercept)        6.19  5.89, 6.49      0.15   40.22  < .001 
+    ## lonely_current    -0.10  -0.14, -0.07    0.02   -5.59  < .001 
+    ## age                0.01  0.00, 0.02      0.00    2.51  .012
+
+``` r
+test <-lm(intentions_sd ~ lonely_current+age, df)
+#summ(test, digits = 3, confint = TRUE)
+summary(test)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = intentions_sd ~ lonely_current + age, data = df)
+    ## 
+    ## Residuals:
+    ##     Min      1Q  Median      3Q     Max 
+    ## -2.9843 -0.2938  0.3147  0.5614  0.9468 
+    ## 
+    ## Coefficients:
+    ##                 Estimate Std. Error t value             Pr(>|t|)    
+    ## (Intercept)     6.251051   0.148429  42.115 < 0.0000000000000002 ***
+    ## lonely_current -0.060983   0.017955  -3.396             0.000736 ***
+    ## age             0.008844   0.003241   2.728             0.006582 ** 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 0.8247 on 514 degrees of freedom
+    ## Multiple R-squared:  0.04048,    Adjusted R-squared:  0.03674 
+    ## F-statistic: 10.84 on 2 and 514 DF,  p-value: 0.00002444
+
+``` r
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.04          0.04   514
+    ## 
+    ## 
+    ## term                  b  95% CI            SE       t  p      
+    ## ---------------  ------  -------------  -----  ------  -------
+    ## (Intercept)        6.25  5.96, 6.54      0.15   42.11  < .001 
+    ## lonely_current    -0.06  -0.10, -0.03    0.02   -3.40  < .001 
+    ## age                0.01  0.00, 0.02      0.00    2.73  .007
+
+## SI5
+
+``` r
+#SI5. Associations between perceived loneliness and responses to COVID-19 related measures.
+ 
+test <- lm(norms_close~lonely_current+as.factor(condition), df)
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4501,7 +4732,7 @@ make_table(test)
 
 ``` r
 test <- lm(beliefs_norms~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4558,7 +4789,7 @@ make_table(test)
 
 ``` r
 test <- lm(beliefs_safe_others~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4615,7 +4846,7 @@ make_table(test)
 
 ``` r
 test <- lm(beliefs_safe_self~lonely_current+as.factor(condition), df)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4672,17 +4903,12 @@ make_table(test)
 
 ## SI6
 
-Subsetting the sample to run analyses for the group that were not
-exposed to messages
-
-In this subsample, higher purpose was associated with lower current
-levels of loneliness as in the main analysis
-
 ``` r
+#SI6. Subsetting the sample. 
 df2 =subset (df,condition=='no message control')
-
+#In this subsample, higher purpose was associated with lower current levels of loneliness as in the main analysis
 test <-lm(lonely_current ~ purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4721,12 +4947,10 @@ make_table(test)
     ## (Intercept)     6.73  5.46, 8.00      0.64   10.48  < .001 
     ## purpose        -0.81  -1.11, -0.52    0.15   -5.51  < .001
 
-Higher purpose was also associated with higher COVID preventive
-intentions in this subsample
-
 ``` r
+#Higher purpose was also associated with higher COVID preventive intentions in this subsample
 test <-lm(intentions~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4767,7 +4991,7 @@ make_table(test)
 
 ``` r
 test <-lm(intentions_sd~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4808,7 +5032,7 @@ make_table(test)
 
 ``` r
 test <-lm(norms_close~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4849,7 +5073,7 @@ make_table(test)
 
 ``` r
 test <-lm(norms_close_sd~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4890,7 +5114,7 @@ make_table(test)
 
 ``` r
 test <-lm(beliefs_norms~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4931,7 +5155,7 @@ make_table(test)
 
 ``` r
 test <-lm(beliefs_safe_others~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4972,7 +5196,7 @@ make_table(test)
 
 ``` r
 test <-lm(beliefs_safe_self~purpose, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -5011,12 +5235,11 @@ make_table(test)
     ## (Intercept)    4.86  4.30, 5.42    0.29   17.01  < .001 
     ## purpose        0.33  0.20, 0.46    0.07    5.06  < .001
 
-Consistent with main results, higher loneliness was associated with
-lower COVID preventive intentions
-
 ``` r
-test <-lm(intentions ~ lonely_current, df2)
+#Consistent with main results, higher loneliness was associated with lower COVID preventive intentions 
 
+test <-lm(intentions ~ lonely_current, df2)
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -5057,7 +5280,7 @@ make_table(test)
 
 ``` r
 test <-lm(intentions_sd ~ lonely_current, df2)
-
+#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -5098,16 +5321,15 @@ make_table(test)
 
 ## Figure SI
 
-Exploratory simple slopes at four levels of age across three levels of
-purpose in life.
-
 ``` r
+#Figure SI.
+#Exploratory simple slopes at four levels of age across three levels of purpose in life.
 test <- lm(intentions ~ lonely_current*age*purpose +as.factor(condition) , df)
 interact_plot(test, pred = lonely_current, modx = age, mod2=purpose, interval = TRUE, 
               int.type = "confidence", int.width = 0.95, modx.values = c(26.4, 37.7, 49, 60.3)) 
 ```
 
-![](analysis_code_files/figure-gfm/unnamed-chunk-36-1.png)<!-- -->
+![](analysis_code_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 summary(lm(intentions_home ~ lonely_current +as.factor(condition) , df))
