@@ -1,7 +1,7 @@
 # covid_purpose
 This repository contains code for the following manuscript:
 
-Age and purpose in life moderate the link between loneliness and protective health behaviors during the COVID-19 pandemic.
+Purpose in life, loneliness, and protective health behaviors during the COVID-19 pandemic
 
 ## directory structure
 * `analysis` = R code for the analyses reported in the manuscript
