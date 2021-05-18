@@ -1,6 +1,5 @@
 Manuscript Analyses
 ================
-Yoona Kang
 2021-05-18
 
 # load packages
@@ -26,7 +25,7 @@ library(corrplot)
 # load data
 
 ``` r
-df <- read.csv('covid19_study1_clean_wide.csv', stringsAsFactors = FALSE)
+df <- read.csv('../data/data_clean_wide.csv', stringsAsFactors = FALSE)
 ```
 
 # clean data

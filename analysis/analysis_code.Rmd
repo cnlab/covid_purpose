@@ -1,6 +1,6 @@
 ---
 title: "Manuscript Analyses"
-author: "Yoona Kang"
+author: ""
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -43,7 +43,7 @@ library(corrplot)
 
 # load data
 ```{r}
-df <- read.csv('covid19_study1_clean_wide.csv', stringsAsFactors = FALSE)
+df <- read.csv('../data/data_clean_wide.csv', stringsAsFactors = FALSE)
 ```
 
 # clean data
