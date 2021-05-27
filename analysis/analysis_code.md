@@ -1,6 +1,6 @@
 Manuscript Analyses
 ================
-2021-05-18
+2021-05-27
 
 # load packages
 
@@ -853,30 +853,14 @@ make_table = function(model) {
 }
 ```
 
-# Purpose in life Predicting Loneliness and COVID-Preventive Intentions
+# Results
+
+## Purpose in Life Predicting Loneliness and COVID Preventive Intentions
 
 ``` r
 #H1a. Higher self-reported purpose in life will be associated with less perceived loneliness.
 
 test <- lm(lonely_current ~ purpose+as.factor(condition), data=df)
-##summ(test, digits = 3, confint = TRUE)
-lm.beta(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = lonely_current ~ purpose + as.factor(condition), 
-    ##     data = df)
-    ## 
-    ## Standardized Coefficients::
-    ##                            (Intercept)                                purpose 
-    ##                             0.00000000                            -0.37344384 
-    ##    as.factor(condition)message control            as.factor(condition)mocking 
-    ##                            -0.03283017                            -0.06196151 
-    ## as.factor(condition)no message control               as.factor(condition)norm 
-    ##                            -0.14561944                            -0.11631820
-
-``` r
 summary(test)
 ```
 
@@ -933,23 +917,6 @@ make_table(test)
 
 ``` r
 test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df)
-##summ(test, digits = 3, confint = TRUE)
-lm.beta(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = lonely_prior ~ purpose + as.factor(condition), data = df)
-    ## 
-    ## Standardized Coefficients::
-    ##                            (Intercept)                                purpose 
-    ##                             0.00000000                            -0.50041815 
-    ##    as.factor(condition)message control            as.factor(condition)mocking 
-    ##                            -0.05326567                            -0.04429902 
-    ## as.factor(condition)no message control               as.factor(condition)norm 
-    ##                            -0.10242154                            -0.06610293
-
-``` r
 summary(test)
 ```
 
@@ -1006,23 +973,6 @@ make_table(test)
 ``` r
 #H2. Higher self-reported purpose in life will be associated with more positive responses to COVID-19 related measures, including intentions, norms, and beliefs.
 test <- lm(intentions~purpose+as.factor(condition), df)
-##summ(test, digits = 3, confint = TRUE)
-lm.beta(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions ~ purpose + as.factor(condition), data = df)
-    ## 
-    ## Standardized Coefficients::
-    ##                            (Intercept)                                purpose 
-    ##                             0.00000000                             0.37468173 
-    ##    as.factor(condition)message control            as.factor(condition)mocking 
-    ##                            -0.07290048                            -0.05148228 
-    ## as.factor(condition)no message control               as.factor(condition)norm 
-    ##                            -0.02674378                            -0.00969147
-
-``` r
 summary(test)
 ```
 
@@ -1076,13 +1026,12 @@ make_table(test)
     ## (condition)no message control    -0.05  -0.27, 0.17    0.11   -0.45  .655   
     ## (condition)norm                  -0.02  -0.28, 0.23    0.13   -0.18  .857
 
-# Loneliness Predicting COVID Preventive Intentions
+## Loneliness Predicting COVID Preventive Intentions
 
 ``` r
 #Exploratory1. We will test whether higher perceived loneliness will be associated with more negative responses to COVID-19 related measures, including intentions, norms, and beliefs
 
 test <- lm(intentions~lonely_current+as.factor(condition), df)
-##summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1139,7 +1088,6 @@ make_table(test)
 
 ``` r
 test <- lm(intentions~lonely_prior+as.factor(condition), df)
-##summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1194,13 +1142,12 @@ make_table(test)
     ## (condition)no message control    -0.12  -0.34, 0.10     0.11   -1.09  .277   
     ## (condition)norm                  -0.05  -0.30, 0.21     0.13   -0.37  .713
 
-# Purpose in Life Moderating the Relationship Between Age and Lonelines
+## Purpose in Life Moderating the Relationship Between Age and Lonelines
 
 ``` r
 #H1b. Age will be tested as a potential moderator for H1a, such that higher purpose is more strongly associated with less loneliness for older adults compared to younger adults
 
 test <- lm(lonely_current ~ age+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1256,7 +1203,6 @@ make_table(test)
 
 ``` r
 test <- lm(lonely_prior ~ age+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1312,7 +1258,6 @@ make_table(test)
 
 ``` r
 test <- lm(lonely_current~ age*purpose+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1403,7 +1348,6 @@ df$purpose_high <- df$purpose_cen - sd(df$purpose_cen, na.rm=T)
 
 #At higher and mean levels of purpose in life, older age was associated with less loneliness, at one standard deviation above the mean and mean levels of purpose in life
 test <-lm(lonely_cen~ purpose_high *age_cen+ as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1466,7 +1410,6 @@ make_table(test)
 
 ``` r
 test <-lm(lonely_cen~ purpose_cen *age_cen+ as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1529,7 +1472,6 @@ make_table(test)
 
 ``` r
 test <-lm(lonely_cen~ purpose_low *age_cen+ as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1590,87 +1532,47 @@ make_table(test)
     ## (condition)norm                  -0.65  -1.23, -0.07    0.30   -2.19  .029   
     ## purpose_low:age_cen              -0.01  -0.02, 0.01     0.01   -1.07  .287
 
-``` r
-#A robustness check by dividing the sample at the median purpose score 
-purpose_high <- subset(df, purpose >= median(df$purpose))
-purpose_low <- subset(df, purpose < median(df$purpose))
+## Exploratory Analyses: The Relationship between Loneliness and COVID Preventive Intentions at Different Levels of Purpose in Life
 
-test <-lm(lonely_cen~ age_cen+ as.factor(condition), purpose_high)
-#summ(test, digits = 3, confint = TRUE)
+``` r
+test <-lm(intentions~ purpose *lonely_current+ as.factor(condition), df)
 summary(test)
 ```
 
     ## 
     ## Call:
-    ## lm(formula = lonely_cen ~ age_cen + as.factor(condition), data = purpose_high)
-    ## 
-    ## Residuals:
-    ##    Min     1Q Median     3Q    Max 
-    ## -2.546 -1.458 -0.524  1.467  4.041 
-    ## 
-    ## Coefficients:
-    ##                                        Estimate Std. Error t value Pr(>|t|)   
-    ## (Intercept)                            -0.15408    0.29770  -0.518  0.60521   
-    ## age_cen                                -0.02801    0.01009  -2.776  0.00591 **
-    ## as.factor(condition)message control    -0.02714    0.38665  -0.070  0.94410   
-    ## as.factor(condition)mocking            -0.69791    0.40743  -1.713  0.08794 . 
-    ## as.factor(condition)no message control -0.84097    0.35241  -2.386  0.01775 * 
-    ## as.factor(condition)norm               -0.85810    0.39001  -2.200  0.02869 * 
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 1.754 on 254 degrees of freedom
-    ## Multiple R-squared:  0.06691,    Adjusted R-squared:  0.04854 
-    ## F-statistic: 3.643 on 5 and 254 DF,  p-value: 0.003358
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.07          0.05   254
-    ## 
-    ## 
-    ## term                                 b  95% CI            SE       t  p    
-    ## ------------------------------  ------  -------------  -----  ------  -----
-    ## (Intercept)                      -0.15  -0.74, 0.43     0.30   -0.52  .605 
-    ## age_cen                          -0.03  -0.05, -0.01    0.01   -2.78  .006 
-    ## (condition)message control       -0.03  -0.79, 0.73     0.39   -0.07  .944 
-    ## (condition)mocking               -0.70  -1.50, 0.10     0.41   -1.71  .088 
-    ## (condition)no message control    -0.84  -1.53, -0.15    0.35   -2.39  .018 
-    ## (condition)norm                  -0.86  -1.63, -0.09    0.39   -2.20  .029
-
-``` r
-test <-lm(lonely_cen~ age_cen+ as.factor(condition), purpose_low)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = lonely_cen ~ age_cen + as.factor(condition), data = purpose_low)
+    ## lm(formula = intentions ~ purpose * lonely_current + as.factor(condition), 
+    ##     data = df)
     ## 
     ## Residuals:
     ##     Min      1Q  Median      3Q     Max 
-    ## -3.6650 -1.8685  0.3243  1.6867  3.1809 
+    ## -3.0972 -0.3940  0.2070  0.5679  1.7004 
     ## 
     ## Coefficients:
-    ##                                        Estimate Std. Error t value Pr(>|t|)   
-    ## (Intercept)                             0.96691    0.30434   3.177  0.00167 **
-    ## age_cen                                -0.01070    0.01082  -0.989  0.32380   
-    ## as.factor(condition)message control    -0.42335    0.42688  -0.992  0.32228   
-    ## as.factor(condition)mocking             0.10561    0.43335   0.244  0.80766   
-    ## as.factor(condition)no message control -0.36578    0.37028  -0.988  0.32417   
-    ## as.factor(condition)norm               -0.37718    0.45524  -0.829  0.40816   
+    ##                                        Estimate Std. Error t value
+    ## (Intercept)                             5.60801    0.34448  16.279
+    ## purpose                                 0.19552    0.07130   2.742
+    ## lonely_current                         -0.17993    0.07884  -2.282
+    ## as.factor(condition)message control    -0.18555    0.12486  -1.486
+    ## as.factor(condition)mocking            -0.13538    0.12921  -1.048
+    ## as.factor(condition)no message control -0.08383    0.11119  -0.754
+    ## as.factor(condition)norm               -0.05946    0.12936  -0.460
+    ## purpose:lonely_current                  0.02957    0.01841   1.606
+    ##                                                    Pr(>|t|)    
+    ## (Intercept)                            < 0.0000000000000002 ***
+    ## purpose                                             0.00632 ** 
+    ## lonely_current                                      0.02288 *  
+    ## as.factor(condition)message control                 0.13788    
+    ## as.factor(condition)mocking                         0.29528    
+    ## as.factor(condition)no message control              0.45122    
+    ## as.factor(condition)norm                            0.64597    
+    ## purpose:lonely_current                              0.10895    
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 2.008 on 251 degrees of freedom
-    ## Multiple R-squared:  0.01584,    Adjusted R-squared:  -0.003765 
-    ## F-statistic: 0.808 on 5 and 251 DF,  p-value: 0.5449
+    ## Residual standard error: 0.8176 on 509 degrees of freedom
+    ## Multiple R-squared:  0.1626, Adjusted R-squared:  0.1511 
+    ## F-statistic: 14.12 on 7 and 509 DF,  p-value: < 0.00000000000000022
 
 ``` r
 make_table(test)
@@ -1680,23 +1582,22 @@ make_table(test)
     ## 
     ##    R2   adjusted_R2    df
     ## -----  ------------  ----
-    ##  0.02             0   251
+    ##  0.16          0.15   509
     ## 
     ## 
-    ## term                                 b  95% CI           SE       t  p    
-    ## ------------------------------  ------  ------------  -----  ------  -----
-    ## (Intercept)                       0.97  0.37, 1.57     0.30    3.18  .002 
-    ## age_cen                          -0.01  -0.03, 0.01    0.01   -0.99  .324 
-    ## (condition)message control       -0.42  -1.26, 0.42    0.43   -0.99  .322 
-    ## (condition)mocking                0.11  -0.75, 0.96    0.43    0.24  .808 
-    ## (condition)no message control    -0.37  -1.10, 0.36    0.37   -0.99  .324 
-    ## (condition)norm                  -0.38  -1.27, 0.52    0.46   -0.83  .408
-
-# Exploratory Analyses: The Relationship between Loneliness and COVID Preventive Intentions at Different Levels of Purpose in Life
+    ## term                                 b  95% CI            SE       t  p      
+    ## ------------------------------  ------  -------------  -----  ------  -------
+    ## (Intercept)                       5.61  4.93, 6.28      0.34   16.28  < .001 
+    ## purpose                           0.20  0.06, 0.34      0.07    2.74  .006   
+    ## lonely_current                   -0.18  -0.33, -0.03    0.08   -2.28  .023   
+    ## (condition)message control       -0.19  -0.43, 0.06     0.12   -1.49  .138   
+    ## (condition)mocking               -0.14  -0.39, 0.12     0.13   -1.05  .295   
+    ## (condition)no message control    -0.08  -0.30, 0.13     0.11   -0.75  .451   
+    ## (condition)norm                  -0.06  -0.31, 0.19     0.13   -0.46  .646   
+    ## purpose:lonely_current            0.03  -0.01, 0.07     0.02    1.61  .109
 
 ``` r
 test <-lm(intentions_cen~ purpose_low *lonely_cen+ as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1759,7 +1660,6 @@ make_table(test)
 
 ``` r
 test <-lm(intentions_cen~ purpose_cen *lonely_cen+ as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1822,7 +1722,6 @@ make_table(test)
 
 ``` r
 test <-lm(intentions_cen~ purpose_high *lonely_cen+ as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -1882,120 +1781,6 @@ make_table(test)
     ## (condition)no message control    -0.08  -0.30, 0.13    0.11   -0.75  .451   
     ## (condition)norm                  -0.06  -0.31, 0.19    0.13   -0.46  .646   
     ## purpose_high:lonely_cen           0.03  -0.01, 0.07    0.02    1.61  .109
-
-``` r
-test <-lm(intentions ~ lonely_cen+ as.factor(condition), purpose_low)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions ~ lonely_cen + as.factor(condition), 
-    ##     data = purpose_low)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.4350 -0.6999  0.2052  0.8298  1.4762 
-    ## 
-    ## Coefficients:
-    ##                                        Estimate Std. Error t value
-    ## (Intercept)                             5.97750    0.14983  39.896
-    ## lonely_cen                             -0.09131    0.03053  -2.991
-    ## as.factor(condition)message control    -0.23009    0.20677  -1.113
-    ## as.factor(condition)mocking            -0.17502    0.20993  -0.834
-    ## as.factor(condition)no message control -0.12439    0.17909  -0.695
-    ## as.factor(condition)norm                0.04592    0.22073   0.208
-    ##                                                    Pr(>|t|)    
-    ## (Intercept)                            < 0.0000000000000002 ***
-    ## lonely_cen                                          0.00306 ** 
-    ## as.factor(condition)message control                 0.26686    
-    ## as.factor(condition)mocking                         0.40525    
-    ## as.factor(condition)no message control              0.48796    
-    ## as.factor(condition)norm                            0.83536    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.9731 on 251 degrees of freedom
-    ## Multiple R-squared:  0.04292,    Adjusted R-squared:  0.02385 
-    ## F-statistic: 2.251 on 5 and 251 DF,  p-value: 0.04991
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.04          0.02   251
-    ## 
-    ## 
-    ## term                                 b  95% CI            SE       t  p      
-    ## ------------------------------  ------  -------------  -----  ------  -------
-    ## (Intercept)                       5.98  5.68, 6.27      0.15   39.90  < .001 
-    ## lonely_cen                       -0.09  -0.15, -0.03    0.03   -2.99  .003   
-    ## (condition)message control       -0.23  -0.64, 0.18     0.21   -1.11  .267   
-    ## (condition)mocking               -0.18  -0.59, 0.24     0.21   -0.83  .405   
-    ## (condition)no message control    -0.12  -0.48, 0.23     0.18   -0.69  .488   
-    ## (condition)norm                   0.05  -0.39, 0.48     0.22    0.21  .835
-
-``` r
-test <-lm(intentions ~ lonely_cen+ as.factor(condition), purpose_high)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions ~ lonely_cen + as.factor(condition), 
-    ##     data = purpose_high)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.9552 -0.2307  0.1735  0.4562  0.6369 
-    ## 
-    ## Coefficients:
-    ##                                        Estimate Std. Error t value
-    ## (Intercept)                             6.58463    0.10426  63.157
-    ## lonely_cen                             -0.01729    0.02171  -0.796
-    ## as.factor(condition)message control    -0.13472    0.13578  -0.992
-    ## as.factor(condition)mocking            -0.17751    0.14320  -1.240
-    ## as.factor(condition)no message control -0.08327    0.12441  -0.669
-    ## as.factor(condition)norm               -0.15089    0.13813  -1.092
-    ##                                                   Pr(>|t|)    
-    ## (Intercept)                            <0.0000000000000002 ***
-    ## lonely_cen                                           0.427    
-    ## as.factor(condition)message control                  0.322    
-    ## as.factor(condition)mocking                          0.216    
-    ## as.factor(condition)no message control               0.504    
-    ## as.factor(condition)norm                             0.276    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.6161 on 254 degrees of freedom
-    ## Multiple R-squared:  0.009978,   Adjusted R-squared:  -0.009511 
-    ## F-statistic: 0.512 on 5 and 254 DF,  p-value: 0.7671
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.01         -0.01   254
-    ## 
-    ## 
-    ## term                                 b  95% CI           SE       t  p      
-    ## ------------------------------  ------  ------------  -----  ------  -------
-    ## (Intercept)                       6.58  6.38, 6.79     0.10   63.16  < .001 
-    ## lonely_cen                       -0.02  -0.06, 0.03    0.02   -0.80  .427   
-    ## (condition)message control       -0.13  -0.40, 0.13    0.14   -0.99  .322   
-    ## (condition)mocking               -0.18  -0.46, 0.10    0.14   -1.24  .216   
-    ## (condition)no message control    -0.08  -0.33, 0.16    0.12   -0.67  .504   
-    ## (condition)norm                  -0.15  -0.42, 0.12    0.14   -1.09  .276
 
 # TABLE & FIGURE
 
@@ -2486,7 +2271,6 @@ cor.test(df$ses_subj, df$house_size_curre)
 ``` r
 #M1: Purpose in life → Loneliness (current)
 test <- lm(lonely_current ~ purpose+as.factor(condition), data=df) 
-#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -2561,7 +2345,6 @@ make_table(test)
 ``` r
 #M2: Purpose in life  → Loneliness (pre-pandemic)
 test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df) 
-#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -2634,7 +2417,6 @@ make_table(test)
 ``` r
 #M3: Purpose in life → COVID preventive intentions
 test <- lm(intentions~purpose+as.factor(condition), df) 
-#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -2707,7 +2489,6 @@ make_table(test)
 ``` r
 #M4: Loneliness (current) → COVID preventive intentions
 test <- lm(intentions~lonely_current+as.factor(condition), df)
-#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -2782,7 +2563,6 @@ make_table(test)
 ``` r
 #M5: Loneliness (pre-pandemic) → COVID preventive intentions
 test <- lm(intentions~lonely_prior+as.factor(condition), df)
-#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -2857,7 +2637,6 @@ make_table(test)
 ``` r
 #M6: Age → Loneliness (current)
 test <- lm(lonely_current ~ age+as.factor(condition), df) 
-#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -2930,7 +2709,6 @@ make_table(test)
 ``` r
 #M7: Age → Loneliness (pre-pandemic)
 test <- lm(lonely_prior ~ age+as.factor(condition), df) 
-#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -3003,7 +2781,6 @@ make_table(test)
 ``` r
 #M8: Purpose in life * Age → Loneliness
 test <- lm(lonely_current~ purpose*age+as.factor(condition), df)
-#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -3086,7 +2863,6 @@ make_table(test)
 ``` r
 #M9: Purpose in life * Loneliness → COVID preventive intentions
 test <- lm(intentions~ purpose*lonely_current+as.factor(condition), df)
-#summ(test, digits = 2, confint = TRUE)
 lm.beta(test)
 ```
 
@@ -3168,13 +2944,12 @@ make_table(test)
 
 # SUPPLEMENTALS
 
-## SI2
+## SI3
 
 ``` r
-#SI2. Associations between self-reported purpose in life and responses to COVID-19 related measures, including norms and beliefs. 
+#SI3. Associations between self-reported purpose in life and responses to COVID-19 related measures, including norms and beliefs.
 
 test <-lm(norms_close~purpose+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3231,7 +3006,6 @@ make_table(test)
 
 ``` r
 test <-lm(beliefs_norms~purpose+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3288,7 +3062,6 @@ make_table(test)
 
 ``` r
 test <-lm(beliefs_safe_others~purpose+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3345,7 +3118,6 @@ make_table(test)
 
 ``` r
 test <-lm(beliefs_safe_self~purpose+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3400,13 +3172,12 @@ make_table(test)
     ## (condition)no message control    -0.02  -0.25, 0.20    0.11   -0.19  .846   
     ## (condition)norm                  -0.07  -0.33, 0.19    0.13   -0.53  .596
 
-## SI3
+## SI4
 
 ``` r
-#SI3. COVID-related outcomes specifically related to social distancing.
+#SI4. COVID-related outcomes specific to social distancing and other non-social distancing behaviors.
 
 test <- lm(intentions_sd~purpose+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3463,7 +3234,6 @@ make_table(test)
 
 ``` r
 test <- lm(intentions_hand~purpose+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3520,7 +3290,6 @@ make_table(test)
 
 ``` r
 test <- lm(intentions_home~purpose+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3576,9 +3345,7 @@ make_table(test)
     ## (condition)norm                   0.14  -0.20, 0.48    0.17    0.82  .414
 
 ``` r
-#Higher purpose also predicted higher perceptions about the normative approval of protective health behaviors including social distancing 
 test <- lm(norms_close_sd~purpose+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3636,7 +3403,6 @@ make_table(test)
 
 ``` r
 test <- lm(norms_close_hand~purpose+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3694,7 +3460,6 @@ make_table(test)
 
 ``` r
 test <- lm(norms_close_home~purpose+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3751,10 +3516,7 @@ make_table(test)
     ## (condition)norm                  -1.74  -7.82, 4.33     3.09   -0.56  .573
 
 ``` r
-#Next, we tested whether the association between loneliness and COVID preventive intentions was driven by specific types of protective behavior.  
-#Higher loneliness predicted worse outcomes for each of the COVID-19 related subcategory behavior: higher loneliness was associated with
 test <- lm(intentions_sd~ lonely_current+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3811,7 +3573,6 @@ make_table(test)
 
 ``` r
 test <- lm(intentions_hand~lonely_current+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3868,7 +3629,6 @@ make_table(test)
 
 ``` r
 test <- lm(intentions_home~lonely_current+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3924,9 +3684,7 @@ make_table(test)
     ## (condition)norm                   0.14  -0.21, 0.48    0.18    0.79  .427
 
 ``` r
-#Higher loneliness also predicted lower perceptions about the normative approval of protective health behaviors including social distancing 
 test <- lm(norms_close_sd~lonely_current+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -3984,7 +3742,6 @@ make_table(test)
 
 ``` r
 test <- lm(norms_close_hand~lonely_current+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4042,7 +3799,6 @@ make_table(test)
 
 ``` r
 test <- lm(norms_close_home~lonely_current+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4098,582 +3854,12 @@ make_table(test)
     ## (condition)no message control    -1.15  -6.45, 4.15     2.70   -0.43  .670   
     ## (condition)norm                  -1.50  -7.68, 4.68     3.15   -0.48  .634
 
-## SI4
-
-``` r
-#SI4. Potential covariates for analysis including loneliness. household size, ses/education, gender
-
-summary(lm(lonely_current ~ purpose+as.factor(condition)+house_size_curre+as.factor(gender)+ses_subj, data=df))#continued to be sig
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = lonely_current ~ purpose + as.factor(condition) + 
-    ##     house_size_curre + as.factor(gender) + ses_subj, data = df)
-    ## 
-    ## Residuals:
-    ##    Min     1Q Median     3Q    Max 
-    ## -4.336 -1.539 -0.032  1.530  4.110 
-    ## 
-    ## Coefficients:
-    ##                                        Estimate Std. Error t value
-    ## (Intercept)                             7.20909    0.52886  13.631
-    ## purpose                                -0.77555    0.09046  -8.573
-    ## as.factor(condition)message control    -0.26644    0.30531  -0.873
-    ## as.factor(condition)mocking            -0.42588    0.31612  -1.347
-    ## as.factor(condition)no message control -0.83558    0.27022  -3.092
-    ## as.factor(condition)norm               -0.82961    0.31262  -2.654
-    ## house_size_curre                       -0.08178    0.06086  -1.344
-    ## as.factor(gender)2                     -0.08194    0.17772  -0.461
-    ## as.factor(gender)3                     -0.80070    1.35636  -0.590
-    ## ses_subj                                0.07349    0.04586   1.603
-    ##                                                    Pr(>|t|)    
-    ## (Intercept)                            < 0.0000000000000002 ***
-    ## purpose                                < 0.0000000000000002 ***
-    ## as.factor(condition)message control                 0.38329    
-    ## as.factor(condition)mocking                         0.17859    
-    ## as.factor(condition)no message control              0.00211 ** 
-    ## as.factor(condition)norm                            0.00824 ** 
-    ## house_size_curre                                    0.17977    
-    ## as.factor(gender)2                                  0.64499    
-    ## as.factor(gender)3                                  0.55527    
-    ## ses_subj                                            0.10975    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 1.881 on 447 degrees of freedom
-    ##   (60 observations deleted due to missingness)
-    ## Multiple R-squared:  0.1692, Adjusted R-squared:  0.1525 
-    ## F-statistic: 10.12 on 9 and 447 DF,  p-value: 0.00000000000003234
-
-``` r
-summary(lm(intentions~lonely_current+as.factor(condition)+house_size_curre+as.factor(gender)+ses_subj, df))#continued to be ns
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions ~ lonely_current + as.factor(condition) + 
-    ##     house_size_curre + as.factor(gender) + ses_subj, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.8599 -0.3802  0.1524  0.5828  1.4482 
-    ## 
-    ## Coefficients:
-    ##                                         Estimate Std. Error t value
-    ## (Intercept)                             7.066783   0.174000  40.614
-    ## lonely_current                         -0.087589   0.018477  -4.741
-    ## as.factor(condition)message control    -0.076484   0.128721  -0.594
-    ## as.factor(condition)mocking            -0.165539   0.133303  -1.242
-    ## as.factor(condition)no message control -0.131404   0.114900  -1.144
-    ## as.factor(condition)norm                0.057914   0.132811   0.436
-    ## house_size_curre                       -0.003338   0.025630  -0.130
-    ## as.factor(gender)2                      0.254839   0.074893   3.403
-    ## as.factor(gender)3                      0.714193   0.566259   1.261
-    ## ses_subj                               -0.116529   0.019258  -6.051
-    ##                                                    Pr(>|t|)    
-    ## (Intercept)                            < 0.0000000000000002 ***
-    ## lonely_current                                0.00000287016 ***
-    ## as.factor(condition)message control                0.552693    
-    ## as.factor(condition)mocking                        0.214954    
-    ## as.factor(condition)no message control             0.253386    
-    ## as.factor(condition)norm                           0.663000    
-    ## house_size_curre                                   0.896438    
-    ## as.factor(gender)2                                 0.000727 ***
-    ## as.factor(gender)3                                 0.207877    
-    ## ses_subj                                      0.00000000305 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.7927 on 447 degrees of freedom
-    ##   (60 observations deleted due to missingness)
-    ## Multiple R-squared:  0.1562, Adjusted R-squared:  0.1392 
-    ## F-statistic: 9.195 on 9 and 447 DF,  p-value: 0.0000000000007957
-
-``` r
-summary(lm(lonely_current~age+as.factor(condition)+house_size_curre+as.factor(gender)+ses_subj, df))#continued to be ns
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = lonely_current ~ age + as.factor(condition) + house_size_curre + 
-    ##     as.factor(gender) + ses_subj, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.2496 -1.9082 -0.0233  1.6834  4.3536 
-    ## 
-    ## Coefficients:
-    ##                                         Estimate Std. Error t value
-    ## (Intercept)                             4.726853   0.510606   9.257
-    ## age                                    -0.019554   0.008515  -2.296
-    ## as.factor(condition)message control    -0.381536   0.327296  -1.166
-    ## as.factor(condition)mocking            -0.338963   0.338940  -1.000
-    ## as.factor(condition)no message control -0.802689   0.289945  -2.768
-    ## as.factor(condition)norm               -0.962444   0.334956  -2.873
-    ## house_size_curre                       -0.063325   0.065396  -0.968
-    ## as.factor(gender)2                     -0.088098   0.192328  -0.458
-    ## as.factor(gender)3                      0.750957   1.441049   0.521
-    ## ses_subj                                0.038510   0.048987   0.786
-    ##                                                    Pr(>|t|)    
-    ## (Intercept)                            < 0.0000000000000002 ***
-    ## age                                                 0.02211 *  
-    ## as.factor(condition)message control                 0.24435    
-    ## as.factor(condition)mocking                         0.31782    
-    ## as.factor(condition)no message control              0.00587 ** 
-    ## as.factor(condition)norm                            0.00425 ** 
-    ## house_size_curre                                    0.33340    
-    ## as.factor(gender)2                                  0.64713    
-    ## as.factor(gender)3                                  0.60254    
-    ## ses_subj                                            0.43221    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 2.017 on 447 degrees of freedom
-    ##   (60 observations deleted due to missingness)
-    ## Multiple R-squared:  0.0439, Adjusted R-squared:  0.02465 
-    ## F-statistic: 2.281 on 9 and 447 DF,  p-value: 0.01657
-
-``` r
-#other potential demographic covariates (age where appropriate)
-
-test <-lm(lonely_current ~ purpose, df)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = lonely_current ~ purpose, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -4.7449 -1.5842 -0.0107  1.6477  4.8547 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value            Pr(>|t|)    
-    ## (Intercept)   6.7539     0.3696  18.271 <0.0000000000000002 ***
-    ## purpose      -0.7681     0.0839  -9.155 <0.0000000000000002 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 1.892 on 515 degrees of freedom
-    ## Multiple R-squared:   0.14,  Adjusted R-squared:  0.1383 
-    ## F-statistic: 83.82 on 1 and 515 DF,  p-value: < 0.00000000000000022
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.14          0.14   515
-    ## 
-    ## 
-    ## term               b  95% CI            SE       t  p      
-    ## ------------  ------  -------------  -----  ------  -------
-    ## (Intercept)     6.75  6.03, 7.48      0.37   18.27  < .001 
-    ## purpose        -0.77  -0.93, -0.60    0.08   -9.16  < .001
-
-``` r
-#Higher purpose was also associated with higher COVID preventive intentions in this subsample
-test <-lm(intentions~purpose+age, df)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions ~ purpose + age, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.1630 -0.4153  0.2312  0.5630  1.6323 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept) 4.420979   0.193563  22.840 < 0.0000000000000002 ***
-    ## purpose     0.326245   0.036415   8.959 < 0.0000000000000002 ***
-    ## age         0.008654   0.003202   2.703              0.00711 ** 
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.819 on 514 degrees of freedom
-    ## Multiple R-squared:  0.1515, Adjusted R-squared:  0.1482 
-    ## F-statistic: 45.87 on 2 and 514 DF,  p-value: < 0.00000000000000022
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.15          0.15   514
-    ## 
-    ## 
-    ## term              b  95% CI          SE       t  p      
-    ## ------------  -----  -----------  -----  ------  -------
-    ## (Intercept)    4.42  4.04, 4.80    0.19   22.84  < .001 
-    ## purpose        0.33  0.25, 0.40    0.04    8.96  < .001 
-    ## age            0.01  0.00, 0.01    0.00    2.70  .007
-
-``` r
-test <-lm(intentions_sd~purpose+age, df)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions_sd ~ purpose + age, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.1850 -0.2725  0.2820  0.5056  1.1301 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept) 5.157287   0.191108  26.986 < 0.0000000000000002 ***
-    ## purpose     0.205367   0.035953   5.712         0.0000000189 ***
-    ## age         0.008879   0.003161   2.809              0.00516 ** 
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.8086 on 514 degrees of freedom
-    ## Multiple R-squared:  0.0775, Adjusted R-squared:  0.07391 
-    ## F-statistic: 21.59 on 2 and 514 DF,  p-value: 0.0000000009915
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.08          0.07   514
-    ## 
-    ## 
-    ## term              b  95% CI          SE       t  p      
-    ## ------------  -----  -----------  -----  ------  -------
-    ## (Intercept)    5.16  4.78, 5.53    0.19   26.99  < .001 
-    ## purpose        0.21  0.13, 0.28    0.04    5.71  < .001 
-    ## age            0.01  0.00, 0.02    0.00    2.81  .005
-
-``` r
-test <-lm(norms_close~purpose+age, df)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = norms_close ~ purpose + age, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -55.608 -10.403   1.302  11.509  31.409 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept) 48.31418    3.56752  13.543 < 0.0000000000000002 ***
-    ## purpose      4.72920    0.67064   7.052     0.00000000000576 ***
-    ## age          0.19743    0.05917   3.336              0.00091 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 15.07 on 511 degrees of freedom
-    ##   (3 observations deleted due to missingness)
-    ## Multiple R-squared:  0.1125, Adjusted R-squared:  0.109 
-    ## F-statistic: 32.38 on 2 and 511 DF,  p-value: 0.00000000000005772
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.11          0.11   511
-    ## 
-    ## 
-    ## term               b  95% CI            SE       t  p      
-    ## ------------  ------  -------------  -----  ------  -------
-    ## (Intercept)    48.31  41.31, 55.32    3.57   13.54  < .001 
-    ## purpose         4.73  3.41, 6.05      0.67    7.05  < .001 
-    ## age             0.20  0.08, 0.31      0.06    3.34  < .001
-
-``` r
-test <-lm(norms_close_sd~purpose+age, df)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = norms_close_sd ~ purpose + age, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -61.538 -10.279   3.888  13.647  31.546 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept) 53.84028    4.24864  12.672 < 0.0000000000000002 ***
-    ## purpose      3.63005    0.79857   4.546           0.00000684 ***
-    ## age          0.20375    0.07029   2.899              0.00391 ** 
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 17.95 on 512 degrees of freedom
-    ##   (2 observations deleted due to missingness)
-    ## Multiple R-squared:  0.05738,    Adjusted R-squared:  0.0537 
-    ## F-statistic: 15.58 on 2 and 512 DF,  p-value: 0.0000002692
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.06          0.05   512
-    ## 
-    ## 
-    ## term               b  95% CI            SE       t  p      
-    ## ------------  ------  -------------  -----  ------  -------
-    ## (Intercept)    53.84  45.49, 62.19    4.25   12.67  < .001 
-    ## purpose         3.63  2.06, 5.20      0.80    4.55  < .001 
-    ## age             0.20  0.07, 0.34      0.07    2.90  .004
-
-``` r
-test <-lm(beliefs_norms~purpose+age, df)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = beliefs_norms ~ purpose + age, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.2766 -0.7762  0.2313  0.8050  2.2288 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept) 4.123089   0.248156  16.615 < 0.0000000000000002 ***
-    ## purpose     0.363051   0.046686   7.776   0.0000000000000411 ***
-    ## age         0.006340   0.004105   1.544                0.123    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 1.05 on 514 degrees of freedom
-    ## Multiple R-squared:  0.1123, Adjusted R-squared:  0.1089 
-    ## F-statistic: 32.52 on 2 and 514 DF,  p-value: 0.00000000000005028
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.11          0.11   514
-    ## 
-    ## 
-    ## term              b  95% CI           SE       t  p      
-    ## ------------  -----  ------------  -----  ------  -------
-    ## (Intercept)    4.12  3.64, 4.61     0.25   16.61  < .001 
-    ## purpose        0.36  0.27, 0.45     0.05    7.78  < .001 
-    ## age            0.01  -0.00, 0.01    0.00    1.54  .123
-
-``` r
-test <-lm(beliefs_safe_others~purpose+age, df)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = beliefs_safe_others ~ purpose + age, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.7851 -0.4416  0.3154  0.6138  1.4076 
-    ## 
-    ## Coefficients:
-    ##              Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept) 4.8853498  0.2289054  21.342 < 0.0000000000000002 ***
-    ## purpose     0.3048806  0.0430643   7.080     0.00000000000477 ***
-    ## age         0.0003644  0.0037867   0.096                0.923    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.9686 on 514 degrees of freedom
-    ## Multiple R-squared:  0.08949,    Adjusted R-squared:  0.08595 
-    ## F-statistic: 25.26 on 2 and 514 DF,  p-value: 0.00000000003433
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.09          0.09   514
-    ## 
-    ## 
-    ## term              b  95% CI           SE       t  p      
-    ## ------------  -----  ------------  -----  ------  -------
-    ## (Intercept)    4.89  4.44, 5.34     0.23   21.34  < .001 
-    ## purpose        0.30  0.22, 0.39     0.04    7.08  < .001 
-    ## age            0.00  -0.01, 0.01    0.00    0.10  .923
-
-``` r
-test <-lm(beliefs_safe_self~purpose+age, df)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = beliefs_safe_self ~ purpose + age, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.2512 -0.4141  0.2512  0.5521  1.4277 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept) 4.830114   0.197906  24.406 < 0.0000000000000002 ***
-    ## purpose     0.292864   0.037232   7.866   0.0000000000000218 ***
-    ## age         0.004583   0.003274   1.400                0.162    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.8374 on 514 degrees of freedom
-    ## Multiple R-squared:  0.1136, Adjusted R-squared:  0.1101 
-    ## F-statistic: 32.93 on 2 and 514 DF,  p-value: 0.00000000000003484
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.11          0.11   514
-    ## 
-    ## 
-    ## term              b  95% CI           SE       t  p      
-    ## ------------  -----  ------------  -----  ------  -------
-    ## (Intercept)    4.83  4.44, 5.22     0.20   24.41  < .001 
-    ## purpose        0.29  0.22, 0.37     0.04    7.87  < .001 
-    ## age            0.00  -0.00, 0.01    0.00    1.40  .162
-
-``` r
-test <-lm(intentions ~ lonely_current+age, df)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions ~ lonely_current + age, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.7465 -0.4409  0.2135  0.6315  1.2774 
-    ## 
-    ## Coefficients:
-    ##                 Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept)     6.189562   0.153890  40.221 < 0.0000000000000002 ***
-    ## lonely_current -0.104061   0.018616  -5.590         0.0000000369 ***
-    ## age             0.008433   0.003361   2.509               0.0124 *  
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.855 on 514 degrees of freedom
-    ## Multiple R-squared:  0.07517,    Adjusted R-squared:  0.07158 
-    ## F-statistic: 20.89 on 2 and 514 DF,  p-value: 0.000000001894
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.08          0.07   514
-    ## 
-    ## 
-    ## term                  b  95% CI            SE       t  p      
-    ## ---------------  ------  -------------  -----  ------  -------
-    ## (Intercept)        6.19  5.89, 6.49      0.15   40.22  < .001 
-    ## lonely_current    -0.10  -0.14, -0.07    0.02   -5.59  < .001 
-    ## age                0.01  0.00, 0.02      0.00    2.51  .012
-
-``` r
-test <-lm(intentions_sd ~ lonely_current+age, df)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions_sd ~ lonely_current + age, data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.9843 -0.2938  0.3147  0.5614  0.9468 
-    ## 
-    ## Coefficients:
-    ##                 Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept)     6.251051   0.148429  42.115 < 0.0000000000000002 ***
-    ## lonely_current -0.060983   0.017955  -3.396             0.000736 ***
-    ## age             0.008844   0.003241   2.728             0.006582 ** 
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.8247 on 514 degrees of freedom
-    ## Multiple R-squared:  0.04048,    Adjusted R-squared:  0.03674 
-    ## F-statistic: 10.84 on 2 and 514 DF,  p-value: 0.00002444
-
-``` r
-make_table(test)
-```
-
-    ## 
-    ## 
-    ##    R2   adjusted_R2    df
-    ## -----  ------------  ----
-    ##  0.04          0.04   514
-    ## 
-    ## 
-    ## term                  b  95% CI            SE       t  p      
-    ## ---------------  ------  -------------  -----  ------  -------
-    ## (Intercept)        6.25  5.96, 6.54      0.15   42.11  < .001 
-    ## lonely_current    -0.06  -0.10, -0.03    0.02   -3.40  < .001 
-    ## age                0.01  0.00, 0.02      0.00    2.73  .007
-
 ## SI5
 
 ``` r
-#SI5. Associations between perceived loneliness and responses to COVID-19 related measures.
- 
+#SI5. Associations between perceived loneliness and responses to COVID-19 related measures. 
+
 test <- lm(norms_close~lonely_current+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4731,7 +3917,6 @@ make_table(test)
 
 ``` r
 test <- lm(beliefs_norms~lonely_current+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4788,7 +3973,6 @@ make_table(test)
 
 ``` r
 test <- lm(beliefs_safe_others~lonely_current+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4845,7 +4029,6 @@ make_table(test)
 
 ``` r
 test <- lm(beliefs_safe_self~lonely_current+as.factor(condition), df)
-#summ(test, digits = 3, confint = TRUE)
 summary(test)
 ```
 
@@ -4903,34 +4086,257 @@ make_table(test)
 ## SI6
 
 ``` r
-#SI6. Subsetting the sample. 
-df2 =subset (df,condition=='no message control')
-#In this subsample, higher purpose was associated with lower current levels of loneliness as in the main analysis
-test <-lm(lonely_current ~ purpose, df2)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
+# Robustness checks
+purpose_high <- subset(df, purpose >= median(df$purpose))
+purpose_low <- subset(df, purpose < median(df$purpose))
+
+test <-lm(lonely_current~ age+ as.factor(condition), purpose_high)
+make_table(test)
 ```
 
     ## 
-    ## Call:
-    ## lm(formula = lonely_current ~ purpose, data = df2)
     ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -4.6596 -1.5429 -0.1941  1.6665  3.6432 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.07          0.05   254
     ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept)   6.7287     0.6422  10.478 < 0.0000000000000002 ***
-    ## purpose      -0.8139     0.1478  -5.508          0.000000127 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 1.914 on 176 degrees of freedom
-    ## Multiple R-squared:  0.147,  Adjusted R-squared:  0.1422 
-    ## F-statistic: 30.34 on 1 and 176 DF,  p-value: 0.0000001268
+    ## term                                 b  95% CI            SE       t  p      
+    ## ------------------------------  ------  -------------  -----  ------  -------
+    ## (Intercept)                       4.36  3.37, 5.35      0.50    8.65  < .001 
+    ## age                              -0.03  -0.05, -0.01    0.01   -2.78  .006   
+    ## (condition)message control       -0.03  -0.79, 0.73     0.39   -0.07  .944   
+    ## (condition)mocking               -0.70  -1.50, 0.10     0.41   -1.71  .088   
+    ## (condition)no message control    -0.84  -1.53, -0.15    0.35   -2.39  .018   
+    ## (condition)norm                  -0.86  -1.63, -0.09    0.39   -2.20  .029
 
 ``` r
+test <-lm(lonely_current~ age+ as.factor(condition), purpose_low)
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.02             0   251
+    ## 
+    ## 
+    ## term                                 b  95% CI           SE       t  p      
+    ## ------------------------------  ------  ------------  -----  ------  -------
+    ## (Intercept)                       4.83  3.88, 5.78     0.48    9.99  < .001 
+    ## age                              -0.01  -0.03, 0.01    0.01   -0.99  .324   
+    ## (condition)message control       -0.42  -1.26, 0.42    0.43   -0.99  .322   
+    ## (condition)mocking                0.11  -0.75, 0.96    0.43    0.24  .808   
+    ## (condition)no message control    -0.37  -1.10, 0.36    0.37   -0.99  .324   
+    ## (condition)norm                  -0.38  -1.27, 0.52    0.46   -0.83  .408
+
+``` r
+test <-lm(intentions ~ lonely_current+ as.factor(condition), purpose_low)
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.04          0.02   251
+    ## 
+    ## 
+    ## term                                 b  95% CI            SE       t  p      
+    ## ------------------------------  ------  -------------  -----  ------  -------
+    ## (Intercept)                       6.29  5.90, 6.69      0.20   31.46  < .001 
+    ## lonely_current                   -0.09  -0.15, -0.03    0.03   -2.99  .003   
+    ## (condition)message control       -0.23  -0.64, 0.18     0.21   -1.11  .267   
+    ## (condition)mocking               -0.18  -0.59, 0.24     0.21   -0.83  .405   
+    ## (condition)no message control    -0.12  -0.48, 0.23     0.18   -0.69  .488   
+    ## (condition)norm                   0.05  -0.39, 0.48     0.22    0.21  .835
+
+``` r
+test <-lm(intentions ~ lonely_current+ as.factor(condition), purpose_high)
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.01         -0.01   254
+    ## 
+    ## 
+    ## term                                 b  95% CI           SE       t  p      
+    ## ------------------------------  ------  ------------  -----  ------  -------
+    ## (Intercept)                       6.64  6.40, 6.89     0.13   52.93  < .001 
+    ## lonely_current                   -0.02  -0.06, 0.03    0.02   -0.80  .427   
+    ## (condition)message control       -0.13  -0.40, 0.13    0.14   -0.99  .322   
+    ## (condition)mocking               -0.18  -0.46, 0.10    0.14   -1.24  .216   
+    ## (condition)no message control    -0.08  -0.33, 0.16    0.12   -0.67  .504   
+    ## (condition)norm                  -0.15  -0.42, 0.12    0.14   -1.09  .276
+
+## SI7
+
+``` r
+#SI7. Potential demographic covariates.
+
+test <- lm(lonely_current ~ purpose+as.factor(condition)+age+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, data=df) #continues to be significant
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.19          0.16   441
+    ## 
+    ## 
+    ## term                                 b  95% CI            SE       t  p      
+    ## ------------------------------  ------  -------------  -----  ------  -------
+    ## (Intercept)                       7.57  6.37, 8.77      0.61   12.42  < .001 
+    ## purpose                          -0.74  -0.92, -0.56    0.09   -8.14  < .001 
+    ## (condition)message control       -0.23  -0.83, 0.37     0.30   -0.74  .457   
+    ## (condition)mocking               -0.48  -1.11, 0.14     0.32   -1.52  .130   
+    ## (condition)no message control    -0.80  -1.33, -0.27    0.27   -2.96  .003   
+    ## (condition)norm                  -0.80  -1.42, -0.19    0.31   -2.56  .011   
+    ## age                              -0.01  -0.03, 0.00     0.01   -1.74  .082   
+    ## (gender)2                        -0.03  -0.38, 0.32     0.18   -0.16  .870   
+    ## (gender)3                        -0.74  -3.41, 1.92     1.36   -0.55  .584   
+    ## (race)2                           0.42  -0.07, 0.91     0.25    1.68  .095   
+    ## (race)3                           0.02  -0.65, 0.68     0.34    0.05  .963   
+    ## (race)4                          -0.58  -2.11, 0.95     0.78   -0.75  .456   
+    ## (race)5                           2.00  -1.73, 5.72     1.90    1.05  .293   
+    ## (race)6                           0.39  -0.70, 1.48     0.56    0.70  .486   
+    ## house_size_curre                 -0.10  -0.22, 0.02     0.06   -1.63  .104   
+    ## ses_subj                          0.07  -0.02, 0.16     0.05    1.45  .148
+
+``` r
+test <- lm(intentions~purpose+as.factor(condition)+age+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, df)#continues to be significant
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.27          0.24   441
+    ## 
+    ## 
+    ## term                                 b  95% CI            SE       t  p      
+    ## ------------------------------  ------  -------------  -----  ------  -------
+    ## (Intercept)                       5.04  4.57, 5.52      0.24   20.83  < .001 
+    ## purpose                           0.32  0.24, 0.39      0.04    8.71  < .001 
+    ## (condition)message control       -0.11  -0.34, 0.13     0.12   -0.88  .380   
+    ## (condition)mocking               -0.09  -0.33, 0.16     0.13   -0.68  .495   
+    ## (condition)no message control    -0.06  -0.27, 0.15     0.11   -0.59  .558   
+    ## (condition)norm                   0.09  -0.16, 0.33     0.12    0.69  .491   
+    ## age                               0.01  0.00, 0.02      0.00    2.87  .004   
+    ## (gender)2                         0.22  0.08, 0.36      0.07    3.05  .002   
+    ## (gender)3                         1.27  0.21, 2.33      0.54    2.35  .019   
+    ## (race)2                          -0.01  -0.21, 0.18     0.10   -0.14  .892   
+    ## (race)3                           0.21  -0.05, 0.48     0.13    1.60  .111   
+    ## (race)4                          -0.19  -0.80, 0.42     0.31   -0.62  .535   
+    ## (race)5                           0.85  -0.63, 2.33     0.75    1.13  .261   
+    ## (race)6                          -0.16  -0.60, 0.27     0.22   -0.74  .462   
+    ## house_size_curre                  0.03  -0.02, 0.07     0.02    1.05  .293   
+    ## ses_subj                         -0.14  -0.17, -0.10    0.02   -7.42  < .001
+
+``` r
+test <- lm(intentions~lonely_current+as.factor(condition)+age+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, df)#continues to be significant
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.18          0.15   441
+    ## 
+    ## 
+    ## term                                 b  95% CI            SE       t  p      
+    ## ------------------------------  ------  -------------  -----  ------  -------
+    ## (Intercept)                       6.70  6.27, 7.13      0.22   30.40  < .001 
+    ## lonely_current                   -0.08  -0.12, -0.05    0.02   -4.40  < .001 
+    ## (condition)message control       -0.08  -0.34, 0.17     0.13   -0.65  .515   
+    ## (condition)mocking               -0.16  -0.42, 0.11     0.13   -1.16  .245   
+    ## (condition)no message control    -0.14  -0.37, 0.08     0.11   -1.24  .216   
+    ## (condition)norm                   0.06  -0.20, 0.32     0.13    0.48  .635   
+    ## age                               0.01  0.00, 0.02      0.00    2.50  .013   
+    ## (gender)2                         0.23  0.08, 0.38      0.08    3.09  .002   
+    ## (gender)3                         0.66  -0.45, 1.77     0.57    1.17  .244   
+    ## (race)2                          -0.07  -0.27, 0.14     0.11   -0.64  .521   
+    ## (race)3                           0.21  -0.07, 0.49     0.14    1.50  .133   
+    ## (race)4                          -0.14  -0.78, 0.51     0.33   -0.42  .678   
+    ## (race)5                           0.85  -0.72, 2.42     0.80    1.07  .286   
+    ## (race)6                          -0.11  -0.57, 0.35     0.23   -0.48  .629   
+    ## house_size_curre                  0.01  -0.04, 0.06     0.03    0.40  .692   
+    ## ses_subj                         -0.12  -0.16, -0.08    0.02   -6.04  < .001
+
+``` r
+test <- lm(lonely_current~ purpose*age+as.factor(condition)+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, df) #continues to be ns
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.19          0.16   440
+    ## 
+    ## 
+    ## term                                 b  95% CI            SE       t  p      
+    ## ------------------------------  ------  -------------  -----  ------  -------
+    ## (Intercept)                       6.26  3.41, 9.12      1.45    4.32  < .001 
+    ## purpose                          -0.43  -1.08, 0.22     0.33   -1.29  .196   
+    ## age                               0.02  -0.05, 0.09     0.04    0.58  .562   
+    ## (condition)message control       -0.25  -0.85, 0.35     0.31   -0.82  .414   
+    ## (condition)mocking               -0.50  -1.13, 0.12     0.32   -1.58  .115   
+    ## (condition)no message control    -0.82  -1.36, -0.29    0.27   -3.03  .003   
+    ## (condition)norm                  -0.82  -1.44, -0.20    0.31   -2.61  .009   
+    ## (gender)2                        -0.03  -0.38, 0.32     0.18   -0.18  .857   
+    ## (gender)3                        -0.67  -3.34, 2.01     1.36   -0.49  .624   
+    ## (race)2                           0.42  -0.07, 0.91     0.25    1.68  .094   
+    ## (race)3                           0.00  -0.66, 0.66     0.34    0.00  1..0   
+    ## (race)4                          -0.63  -2.16, 0.91     0.78   -0.80  .423   
+    ## (race)5                           2.09  -1.64, 5.82     1.90    1.10  .272   
+    ## (race)6                           0.35  -0.75, 1.44     0.56    0.62  .535   
+    ## house_size_curre                 -0.10  -0.23, 0.02     0.06   -1.66  .097   
+    ## ses_subj                          0.07  -0.02, 0.16     0.05    1.46  .144   
+    ## purpose:age                      -0.01  -0.02, 0.01     0.01   -0.99  .323
+
+``` r
+test <- lm(intentions~ purpose*lonely_current+as.factor(condition)+age+as.factor(gender)+house_size_curre+ses_subj, df) #continues to be ns
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.26          0.24   444
+    ## 
+    ## 
+    ## term                                 b  95% CI            SE       t  p      
+    ## ------------------------------  ------  -------------  -----  ------  -------
+    ## (Intercept)                       5.41  4.69, 6.13      0.37   14.79  < .001 
+    ## purpose                           0.27  0.14, 0.41      0.07    3.92  < .001 
+    ## lonely_current                   -0.06  -0.21, 0.09     0.08   -0.73  .468   
+    ## (condition)message control       -0.12  -0.36, 0.12     0.12   -1.02  .310   
+    ## (condition)mocking               -0.10  -0.35, 0.14     0.13   -0.83  .410   
+    ## (condition)no message control    -0.08  -0.30, 0.13     0.11   -0.77  .443   
+    ## (condition)norm                   0.05  -0.20, 0.29     0.12    0.37  .715   
+    ## age                               0.01  0.00, 0.01      0.00    2.57  .010   
+    ## (gender)2                         0.21  0.07, 0.35      0.07    2.95  .003   
+    ## (gender)3                         1.33  0.27, 2.38      0.54    2.47  .014   
+    ## house_size_curre                  0.02  -0.03, 0.06     0.02    0.70  .487   
+    ## ses_subj                         -0.13  -0.17, -0.10    0.02   -7.27  < .001 
+    ## purpose:lonely_current            0.01  -0.03, 0.04     0.02    0.35  .727
+
+## SI8
+
+``` r
+#SI8. Subsetting the sample. 
+df2 =subset (df,condition=='no message control')
+#In this subsample, higher purpose was associated with lower current levels of loneliness as in the main analysis
+test <-lm(lonely_current ~ purpose, df2)
 make_table(test)
 ```
 
@@ -4949,30 +4355,6 @@ make_table(test)
 ``` r
 #Higher purpose was also associated with higher COVID preventive intentions in this subsample
 test <-lm(intentions~purpose, df2)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions ~ purpose, data = df2)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.6125 -0.4140  0.2235  0.5916  1.5889 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept)  4.75002    0.27721  17.135 < 0.0000000000000002 ***
-    ## purpose      0.33057    0.06379   5.182          0.000000596 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.8263 on 176 degrees of freedom
-    ## Multiple R-squared:  0.1324, Adjusted R-squared:  0.1275 
-    ## F-statistic: 26.86 on 1 and 176 DF,  p-value: 0.000000596
-
-``` r
 make_table(test)
 ```
 
@@ -4990,30 +4372,6 @@ make_table(test)
 
 ``` r
 test <-lm(intentions_sd~purpose, df2)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions_sd ~ purpose, data = df2)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.2391 -0.2565  0.2671  0.4800  1.0882 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept)  5.48599    0.25635  21.400 < 0.0000000000000002 ***
-    ## purpose      0.21288    0.05899   3.609             0.000401 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.7641 on 176 degrees of freedom
-    ## Multiple R-squared:  0.0689, Adjusted R-squared:  0.06361 
-    ## F-statistic: 13.02 on 1 and 176 DF,  p-value: 0.0004005
-
-``` r
 make_table(test)
 ```
 
@@ -5031,30 +4389,6 @@ make_table(test)
 
 ``` r
 test <-lm(norms_close~purpose, df2)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = norms_close ~ purpose, data = df2)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -56.636  -9.106   2.389  10.968  24.047 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept)   61.482      4.966  12.380 < 0.0000000000000002 ***
-    ## purpose        3.857      1.143   3.376             0.000906 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 14.8 on 176 degrees of freedom
-    ## Multiple R-squared:  0.0608, Adjusted R-squared:  0.05547 
-    ## F-statistic: 11.39 on 1 and 176 DF,  p-value: 0.0009065
-
-``` r
 make_table(test)
 ```
 
@@ -5072,30 +4406,6 @@ make_table(test)
 
 ``` r
 test <-lm(norms_close_sd~purpose, df2)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = norms_close_sd ~ purpose, data = df2)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -63.218  -9.518   3.721  12.453  23.934 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value            Pr(>|t|)    
-    ## (Intercept)   65.940      5.335  12.361 <0.0000000000000002 ***
-    ## purpose        3.082      1.227   2.511              0.0129 *  
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 15.9 on 176 degrees of freedom
-    ## Multiple R-squared:  0.03458,    Adjusted R-squared:  0.0291 
-    ## F-statistic: 6.304 on 1 and 176 DF,  p-value: 0.01294
-
-``` r
 make_table(test)
 ```
 
@@ -5113,30 +4423,6 @@ make_table(test)
 
 ``` r
 test <-lm(beliefs_norms~purpose, df2)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = beliefs_norms ~ purpose, data = df2)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.2406 -0.7641  0.2921  0.8392  1.8684 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept)  4.76485    0.35603  13.383 < 0.0000000000000002 ***
-    ## purpose      0.27920    0.08192   3.408             0.000811 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 1.061 on 176 degrees of freedom
-    ## Multiple R-squared:  0.06191,    Adjusted R-squared:  0.05658 
-    ## F-statistic: 11.62 on 1 and 176 DF,  p-value: 0.0008109
-
-``` r
 make_table(test)
 ```
 
@@ -5154,30 +4440,6 @@ make_table(test)
 
 ``` r
 test <-lm(beliefs_safe_others~purpose, df2)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = beliefs_safe_others ~ purpose, data = df2)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.9956 -0.4997  0.3480  0.5773  1.4372 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept)  4.53090    0.30795  14.713 < 0.0000000000000002 ***
-    ## purpose      0.40128    0.07086   5.663         0.0000000595 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.9179 on 176 degrees of freedom
-    ## Multiple R-squared:  0.1541, Adjusted R-squared:  0.1493 
-    ## F-statistic: 32.07 on 1 and 176 DF,  p-value: 0.0000000595
-
-``` r
 make_table(test)
 ```
 
@@ -5195,30 +4457,6 @@ make_table(test)
 
 ``` r
 test <-lm(beliefs_safe_self~purpose, df2)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = beliefs_safe_self ~ purpose, data = df2)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.3562 -0.3601  0.2854  0.5366  1.4264 
-    ## 
-    ## Coefficients:
-    ##             Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept)  4.86054    0.28579  17.008 < 0.0000000000000002 ***
-    ## purpose      0.33278    0.06576   5.061           0.00000105 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.8518 on 176 degrees of freedom
-    ## Multiple R-squared:  0.127,  Adjusted R-squared:  0.1221 
-    ## F-statistic: 25.61 on 1 and 176 DF,  p-value: 0.000001045
-
-``` r
 make_table(test)
 ```
 
@@ -5235,33 +4473,7 @@ make_table(test)
     ## purpose        0.33  0.20, 0.46    0.07    5.06  < .001
 
 ``` r
-#Consistent with main results, higher loneliness was associated with lower COVID preventive intentions 
-
 test <-lm(intentions ~ lonely_current, df2)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions ~ lonely_current, data = df2)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -2.7222 -0.3944  0.2305  0.5931  1.2679 
-    ## 
-    ## Coefficients:
-    ##                Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept)     6.51931    0.12061  54.051 < 0.0000000000000002 ***
-    ## lonely_current -0.11246    0.03113  -3.613             0.000395 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.8559 on 176 degrees of freedom
-    ## Multiple R-squared:  0.06903,    Adjusted R-squared:  0.06374 
-    ## F-statistic: 13.05 on 1 and 176 DF,  p-value: 0.0003953
-
-``` r
 make_table(test)
 ```
 
@@ -5279,30 +4491,6 @@ make_table(test)
 
 ``` r
 test <-lm(intentions_sd ~ lonely_current, df2)
-#summ(test, digits = 3, confint = TRUE)
-summary(test)
-```
-
-    ## 
-    ## Call:
-    ## lm(formula = intentions_sd ~ lonely_current, data = df2)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.0362 -0.3276  0.2653  0.5153  0.8936 
-    ## 
-    ## Coefficients:
-    ##                Estimate Std. Error t value             Pr(>|t|)    
-    ## (Intercept)     6.63597    0.10938   60.67 < 0.0000000000000002 ***
-    ## lonely_current -0.07565    0.02823   -2.68              0.00807 ** 
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 0.7762 on 176 degrees of freedom
-    ## Multiple R-squared:  0.0392, Adjusted R-squared:  0.03374 
-    ## F-statistic:  7.18 on 1 and 176 DF,  p-value: 0.00807
-
-``` r
 make_table(test)
 ```
 
@@ -5322,45 +4510,19 @@ make_table(test)
 
 ``` r
 #Figure SI.
-#Exploratory simple slopes at four levels of age across three levels of purpose in life.
-test <- lm(intentions ~ lonely_current*age*purpose +as.factor(condition) , df)
-interact_plot(test, pred = lonely_current, modx = age, mod2=purpose, interval = TRUE, 
-              int.type = "confidence", int.width = 0.95, modx.values = c(26.4, 37.7, 49, 60.3)) 
+#A. Exploratory simple slopes analysis testing the relationship between current loneliness and COVID preventive intentions at three levels of purpose in life. 
+test <- lm(intentions ~ lonely_current*purpose +as.factor(condition) , df)
+interact_plot(test, pred = lonely_current, modx =purpose, interval = TRUE, 
+              int.type = "confidence", int.width = 0.95, )
 ```
 
-![](analysis_code_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](analysis_code_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 ``` r
-summary(lm(intentions_home ~ lonely_current +as.factor(condition) , df))
+#B. Exploratory simple slopes analyses displaying four levels of age across three levels of purpose in life.
+test <- lm(intentions ~ lonely_current*age*purpose +as.factor(condition) , df)
+interact_plot(test, pred = lonely_current, modx = age, mod2=purpose, interval = TRUE, 
+              int.type = "confidence", int.width = 0.95, modx.values = c(26.4, 37.7, 49, 60.3))
 ```
 
-    ## 
-    ## Call:
-    ## lm(formula = intentions_home ~ lonely_current + as.factor(condition), 
-    ##     data = df)
-    ## 
-    ## Residuals:
-    ##     Min      1Q  Median      3Q     Max 
-    ## -3.5779 -0.2925  0.5663  0.7075  0.9879 
-    ## 
-    ## Coefficients:
-    ##                                        Estimate Std. Error t value
-    ## (Intercept)                             6.44352    0.15654  41.162
-    ## lonely_current                         -0.04705    0.02416  -1.947
-    ## as.factor(condition)message control    -0.10208    0.16908  -0.604
-    ## as.factor(condition)mocking             0.02626    0.17502   0.150
-    ## as.factor(condition)no message control  0.03722    0.15073   0.247
-    ## as.factor(condition)norm                0.13948    0.17546   0.795
-    ##                                                   Pr(>|t|)    
-    ## (Intercept)                            <0.0000000000000002 ***
-    ## lonely_current                                       0.052 .  
-    ## as.factor(condition)message control                  0.546    
-    ## as.factor(condition)mocking                          0.881    
-    ## as.factor(condition)no message control               0.805    
-    ## as.factor(condition)norm                             0.427    
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Residual standard error: 1.109 on 511 degrees of freedom
-    ## Multiple R-squared:  0.01261,    Adjusted R-squared:  0.002944 
-    ## F-statistic: 1.305 on 5 and 511 DF,  p-value: 0.2604
+![](analysis_code_files/figure-gfm/unnamed-chunk-20-2.png)<!-- -->
