@@ -3,9 +3,9 @@ title: "Manuscript Analyses"
 author: ''
 date: "`r Sys.Date()`"
 output:
-  github_document:
+  word_document:
     toc: yes
-    toc_depth: 2
+    toc_depth: '2'
   html_document:
     code_folding: show
     df_print: paged
@@ -18,9 +18,9 @@ output:
   pdf_document:
     toc: yes
     toc_depth: '2'
-  word_document:
+  github_document:
     toc: yes
-    toc_depth: '2'
+    toc_depth: 2
 ---
 
 ```{r setup, include=FALSE}
@@ -337,16 +337,13 @@ make_table = function(model) {
 #H1a. Higher self-reported purpose in life will be associated with less perceived loneliness.
 
 test <- lm(lonely_current ~ purpose+as.factor(condition), data=df)
-summary(test)
 make_table(test)
 
 test <- lm(lonely_prior ~ purpose+as.factor(condition), data=df)
-summary(test)
 make_table(test)
 
 #H2. Higher self-reported purpose in life will be associated with more positive responses to COVID-19 related measures, including intentions, norms, and beliefs.
 test <- lm(intentions~purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 ```
@@ -356,11 +353,9 @@ make_table(test)
 #Exploratory1. We will test whether higher perceived loneliness will be associated with more negative responses to COVID-19 related measures, including intentions, norms, and beliefs
 
 test <- lm(intentions~lonely_current+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(intentions~lonely_prior+as.factor(condition), df)
-summary(test)
 make_table(test)
 ```
 
@@ -370,15 +365,12 @@ make_table(test)
 #H1b. Age will be tested as a potential moderator for H1a, such that higher purpose is more strongly associated with less loneliness for older adults compared to younger adults
 
 test <- lm(lonely_current ~ age+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(lonely_prior ~ age+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(lonely_current~ age*purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 #simple slopes analysis
@@ -397,15 +389,12 @@ df$purpose_high <- df$purpose_cen - sd(df$purpose_cen, na.rm=T)
 
 #At higher and mean levels of purpose in life, older age was associated with less loneliness, at one standard deviation above the mean and mean levels of purpose in life
 test <-lm(lonely_cen~ purpose_high *age_cen+ as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <-lm(lonely_cen~ purpose_cen *age_cen+ as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <-lm(lonely_cen~ purpose_low *age_cen+ as.factor(condition), df)
-summary(test)
 make_table(test)
 
 ```
@@ -413,19 +402,15 @@ make_table(test)
 ## Exploratory Analyses: The Relationship between Loneliness and COVID Preventive Intentions at Different Levels of Purpose in Life 
 ```{r}
 test <-lm(intentions~ purpose *lonely_current+ as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <-lm(intentions_cen~ purpose_low *lonely_cen+ as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <-lm(intentions_cen~ purpose_cen *lonely_cen+ as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <-lm(intentions_cen~ purpose_high *lonely_cen+ as.factor(condition), df)
-summary(test)
 make_table(test)
 
 ```
@@ -554,19 +539,15 @@ make_table(test)
 #SI3. Associations between self-reported purpose in life and responses to COVID-19 related measures, including norms and beliefs.
 
 test <-lm(norms_close~purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <-lm(beliefs_norms~purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <-lm(beliefs_safe_others~purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <-lm(beliefs_safe_self~purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 ```
@@ -576,51 +557,39 @@ make_table(test)
 #SI4. COVID-related outcomes specific to social distancing and other non-social distancing behaviors.
 
 test <- lm(intentions_sd~purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(intentions_hand~purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(intentions_home~purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(norms_close_sd~purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(norms_close_hand~purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(norms_close_home~purpose+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(intentions_sd~ lonely_current+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(intentions_hand~lonely_current+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(intentions_home~lonely_current+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(norms_close_sd~lonely_current+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(norms_close_hand~lonely_current+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(norms_close_home~lonely_current+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 ```
@@ -630,19 +599,15 @@ make_table(test)
 #SI5. Associations between perceived loneliness and responses to COVID-19 related measures. 
 
 test <- lm(norms_close~lonely_current+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(beliefs_norms~lonely_current+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(beliefs_safe_others~lonely_current+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 test <- lm(beliefs_safe_self~lonely_current+as.factor(condition), df)
-summary(test)
 make_table(test)
 
 
