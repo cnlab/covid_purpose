@@ -12,7 +12,6 @@ Purpose in life, loneliness, and protective health behaviors during the COVID-19
 ├── analysis
     ├── analysis_code.md
     ├── analysis_code.Rmd
-    └── analysis_code.html
 └── cleaning
     ├── data_cleaning.Rmd
     └── state_codes.csv
