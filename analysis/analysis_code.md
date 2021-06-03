@@ -1,6 +1,6 @@
 Manuscript Analyses
 ================
-2021-05-27
+2021-06-03
 
 # load packages
 
@@ -2949,6 +2949,37 @@ make_table(test)
     ## ses_subj                          0.07  -0.02, 0.16     0.05    1.45  .148
 
 ``` r
+test <- lm(lonely_prior ~ purpose+as.factor(condition)+age+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, data=df) #continues to be significant
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##   R2   adjusted_R2    df
+    ## ----  ------------  ----
+    ##  0.3          0.28   441
+    ## 
+    ## 
+    ## term                                 b  95% CI            SE        t  p      
+    ## ------------------------------  ------  -------------  -----  -------  -------
+    ## (Intercept)                       7.21  6.21, 8.20      0.51    14.20  < .001 
+    ## purpose                          -0.89  -1.04, -0.75    0.08   -11.78  < .001 
+    ## (condition)message control       -0.39  -0.89, 0.11     0.25    -1.53  .126   
+    ## (condition)mocking               -0.38  -0.90, 0.14     0.26    -1.44  .150   
+    ## (condition)no message control    -0.55  -0.99, -0.11    0.23    -2.44  .015   
+    ## (condition)norm                  -0.49  -1.00, 0.02     0.26    -1.89  .060   
+    ## age                              -0.01  -0.03, -0.00    0.01    -2.21  .027   
+    ## (gender)2                        -0.20  -0.49, 0.10     0.15    -1.32  .186   
+    ## (gender)3                        -0.77  -2.99, 1.45     1.13    -0.68  .497   
+    ## (race)2                           0.56  0.15, 0.97      0.21     2.69  .007   
+    ## (race)3                           0.02  -0.54, 0.57     0.28     0.06  .950   
+    ## (race)4                          -0.55  -1.83, 0.72     0.65    -0.85  .396   
+    ## (race)5                           1.51  -1.60, 4.61     1.58     0.95  .341   
+    ## (race)6                           0.40  -0.51, 1.31     0.46     0.87  .385   
+    ## house_size_curre                 -0.03  -0.13, 0.07     0.05    -0.53  .594   
+    ## ses_subj                          0.07  -0.01, 0.15     0.04     1.77  .078
+
+``` r
 test <- lm(intentions~purpose+as.factor(condition)+age+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, df)#continues to be significant
 make_table(test)
 ```
@@ -3009,6 +3040,37 @@ make_table(test)
     ## (race)6                          -0.11  -0.57, 0.35     0.23   -0.48  .629   
     ## house_size_curre                  0.01  -0.04, 0.06     0.03    0.40  .692   
     ## ses_subj                         -0.12  -0.16, -0.08    0.02   -6.04  < .001
+
+``` r
+test <- lm(intentions~lonely_prior+as.factor(condition)+age+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, df)#continues to be significant
+make_table(test)
+```
+
+    ## 
+    ## 
+    ##    R2   adjusted_R2    df
+    ## -----  ------------  ----
+    ##  0.24          0.22   441
+    ## 
+    ## 
+    ## term                                 b  95% CI            SE       t  p      
+    ## ------------------------------  ------  -------------  -----  ------  -------
+    ## (Intercept)                       6.89  6.48, 7.30      0.21   33.19  < .001 
+    ## lonely_prior                     -0.16  -0.20, -0.12    0.02   -7.82  < .001 
+    ## (condition)message control       -0.14  -0.38, 0.10     0.12   -1.13  .260   
+    ## (condition)mocking               -0.17  -0.42, 0.08     0.13   -1.30  .193   
+    ## (condition)no message control    -0.16  -0.37, 0.06     0.11   -1.45  .148   
+    ## (condition)norm                   0.04  -0.21, 0.29     0.13    0.30  .764   
+    ## age                               0.01  0.00, 0.01      0.00    2.20  .028   
+    ## (gender)2                         0.20  0.06, 0.34      0.07    2.74  .006   
+    ## (gender)3                         0.77  -0.29, 1.84     0.54    1.42  .156   
+    ## (race)2                           0.01  -0.19, 0.21     0.10    0.13  .893   
+    ## (race)3                           0.22  -0.05, 0.48     0.14    1.59  .114   
+    ## (race)4                          -0.21  -0.83, 0.41     0.31   -0.66  .509   
+    ## (race)5                           0.98  -0.53, 2.48     0.76    1.28  .203   
+    ## (race)6                          -0.09  -0.53, 0.35     0.22   -0.39  .698   
+    ## house_size_curre                  0.02  -0.03, 0.07     0.02    0.66  .507   
+    ## ses_subj                         -0.12  -0.15, -0.08    0.02   -6.26  < .001
 
 ``` r
 test <- lm(lonely_current~ purpose*age+as.factor(condition)+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, df) #continues to be ns
