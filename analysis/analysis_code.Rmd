@@ -640,10 +640,16 @@ make_table(test)
 test <- lm(lonely_current ~ purpose+as.factor(condition)+age+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, data=df) #continues to be significant
 make_table(test)
 
+test <- lm(lonely_prior ~ purpose+as.factor(condition)+age+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, data=df) #continues to be significant
+make_table(test)
+
 test <- lm(intentions~purpose+as.factor(condition)+age+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, df)#continues to be significant
 make_table(test)
 
 test <- lm(intentions~lonely_current+as.factor(condition)+age+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, df)#continues to be significant
+make_table(test)
+
+test <- lm(intentions~lonely_prior+as.factor(condition)+age+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, df)#continues to be significant
 make_table(test)
 
 test <- lm(lonely_current~ purpose*age+as.factor(condition)+as.factor(gender)+as.factor(race)+house_size_curre+ses_subj, df) #continues to be ns
