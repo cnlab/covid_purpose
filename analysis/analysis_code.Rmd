@@ -1,6 +1,6 @@
 ---
 title: "Manuscript Analyses"
-author: ''
+author: 'Yoona Kang'
 date: "`r Sys.Date()`"
 output:
   word_document:
