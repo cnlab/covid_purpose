@@ -1,6 +1,6 @@
 ---
 title: "COVID19 Study1 Data Cleaning"
-author: ""
+author: "Danielle Cosme"
 date: "`r Sys.Date()`"
 output:
   html_document:
